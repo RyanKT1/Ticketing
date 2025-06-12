@@ -1,23 +1,29 @@
 //import { STSClient, AssumeRoleCommand } from "@aws-sdk/client-sts";
-import { DynamoDBClient, ScanCommand, AttributeValue, PutItemCommand, DeleteItemCommand, GetItemCommand } from "@aws-sdk/client-dynamodb";
-import { fromEnv } from '@aws-sdk/credential-providers';
-import { Injectable } from "@nestjs/common";
-import { Device } from "./entity/device.entity";
-
+import {
+    DynamoDBClient,
+    ScanCommand,
+    AttributeValue,
+    PutItemCommand,
+    DeleteItemCommand,
+    GetItemCommand,
+    PutItemCommandOutput,
+    DeleteItemCommandOutput,
+} from '@aws-sdk/client-dynamodb';
+import { Injectable } from '@nestjs/common';
+import { Device } from './entity/device.entity';
 
 @Injectable()
-export class DevicesRepository{
-    private readonly tableName = "devices"
-    private readonly region = "eu-west-1"
-    private readonly tableRoleArn = "arn:aws:iam::020184830573:role/IibsAdminAccess-DO-NOT-DELETE"
-    private  dynamoDbClient: DynamoDBClient
+export class DevicesRepository {
+    private readonly tableName = 'devices';
+    private readonly region = 'eu-west-1';
+    private readonly tableRoleArn = 'arn:aws:iam::020184830573:role/IibsAdminAccess-DO-NOT-DELETE';
+    private dynamoDbClient: DynamoDBClient;
     constructor() {
-        // move this to a helper file
-        this.initialiseDynamoDbClient()
-        
+        //ryantodo move this to a helper file and learn what catch does
+        this.initialiseDynamoDbClient();
     }
-    private async initialiseDynamoDbClient(){
-       /* const stsClient = new STSClient({ region: this.region });
+    private initialiseDynamoDbClient() {
+        /* const stsClient = new STSClient({ region: this.region });
         const stsResponse = await stsClient.send(new AssumeRoleCommand({RoleArn:this.tableRoleArn, RoleSessionName:"Tablesession"}));
         const dynamoDbCredentials = {
             accessKeyId: stsResponse.Credentials!.AccessKeyId!,
@@ -25,99 +31,101 @@ export class DevicesRepository{
             sessionToken: stsResponse.Credentials!.SessionToken!,
         };*/
         this.dynamoDbClient = new DynamoDBClient({
-            region:this.region,
-            credentials:{/*will error right now since im manually using adding access keys */}
-        })
+            region: this.region,
+            credentials: {
+                
+            },
+        });
     }
-    public async findAllDevices():Promise<Device[]>{
-        const devicesList: Device[] = []
+    public async findAllDevices(): Promise<Device[]> {
+        const devicesList: Device[] = [];
 
         const command = new ScanCommand({
-            TableName:this.tableName
-        })
+            TableName: this.tableName,
+        });
         const response = await this.dynamoDbClient.send(command);
-        if (response.Items){
+
+        if (response.Items) {
             // parse the result into an array and return it at devices
-            response.Items.map(device =>{
-                devicesList.push(Device.createDeviceInstanceFromDynamoDbObject(device))
-            })
+            response.Items.map(device => {
+                devicesList.push(Device.createDeviceInstanceFromDynamoDbObject(device));
+            });
         }
-        return devicesList
+        return devicesList;
     }
 
-    public async upsertOneDevice(device:Device){
+    public async upsertOneDevice(device: Device): Promise<PutItemCommandOutput> {
         // combination of both create and update method
-        const deviceObject:Record<string,AttributeValue> = {
-            id:{
-                S:device.id
+        const deviceObject: Record<string, AttributeValue> = {
+            id: {
+                S: device.id,
             },
-        }
-        if (device.manufacturer){
+        };
+        if (device.manufacturer) {
             deviceObject.manufacturer = {
-                S:device.manufacturer
-            }
+                S: device.manufacturer,
+            };
         }
-         if (device.model){
+        if (device.model) {
             deviceObject.model = {
-                S:device.model
-            }
+                S: device.model,
+            };
         }
-         if (device.name){
+        if (device.name) {
             deviceObject.name = {
-                S:device.name
-            }
+                S: device.name,
+            };
         }
-        if (device.updatedAt){
+        if (device.updatedAt) {
             deviceObject.updatedAt = {
-                S: String(device.updatedAt)
-            }
+                S: String(device.updatedAt),
+            };
         }
-        if (device.createdAt){
+        if (device.createdAt) {
             deviceObject.createdAt = {
-                S: String(device.createdAt)
-            }
+                S: String(device.createdAt),
+            };
         }
         const command = new PutItemCommand({
-            TableName:this.tableName,
-            Item:deviceObject,
-        })
-        const response = await this.dynamoDbClient.send(command)
+            TableName: this.tableName,
+            Item: deviceObject,
+        });
+        return await this.dynamoDbClient.send(command);
     }
 
-    public async findOneDevice(id:string){
+    public async findOneDevice(id: string): Promise<Device | undefined> {
         const command = new GetItemCommand({
             TableName: this.tableName,
             Key: {
-                id:{
-                    S: id
-                }
-            }
-        })
-        const response = await this.dynamoDbClient.send(command)
+                id: {
+                    S: id,
+                },
+            },
+        });
+        const response = await this.dynamoDbClient.send(command);
         if (response.Item) {
-            return Device.createDeviceInstanceFromDynamoDbObject(response.Item)
+            return Device.createDeviceInstanceFromDynamoDbObject(response.Item);
         }
-        return undefined
+        return undefined;
     }
 
-
-
-    public async deleteOneDevice(id:string){
+    public async deleteOneDevice(id: string):Promise<DeleteItemCommandOutput> {
         const command = new DeleteItemCommand({
             TableName: this.tableName,
             Key: {
-                id :{
-                    S:id
-                 },
-             },
-             ReturnConsumedCapacity:'TOTAL',
-             ReturnValues:  "ALL_OLD",
-        })
-        const result = await this.dynamoDbClient.send(command)
-        if (result.Attributes){
-            return true
+                id: {
+                    S: id,
+                },
+            },
+            ReturnConsumedCapacity: 'TOTAL',
+            ReturnValues: 'ALL_OLD',
+        });
+        return await this.dynamoDbClient.send(command);
+       /* const result = await this.dynamoDbClient.send(command);
+        if (result.Attributes) {
+            return true;
         }
-        return false // if nothing is returned that means item was not deleted
+        // should throw error
+        return false; // if nothing is returned that means item was not deleted*/
     }
-    
 }

@@ -1,5 +1,4 @@
-import { CreateDeviceDto } from "./create-device-dto";
-import { PartialType } from "@nestjs/mapped-types"
+import { CreateDeviceDto } from './create-device-dto';
+import { PartialType } from '@nestjs/mapped-types';
 
-export class UpdateDeviceDto extends PartialType(CreateDeviceDto){
-}
+export class UpdateDeviceDto extends PartialType(CreateDeviceDto) {}
