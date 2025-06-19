@@ -2,6 +2,7 @@
   "compilerOptions": {
     "target": "ES2022",
     "module": "NodeNext",
+    "outDir":"dist",
     "moduleResolution": "NodeNext",
     "lib": [
       "es2022"
@@ -26,6 +27,7 @@
   },
   "exclude": [
     "node_modules",
-    "cdk.out"
+    "cdk.out",
+    "dist"
   ]
 }

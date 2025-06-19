@@ -15,26 +15,16 @@ import { Device } from './entity/device.entity';
 @Injectable()
 export class DevicesRepository {
     private readonly tableName = 'devices';
-    private readonly region = 'eu-west-1';
+    private readonly region = 'eu-west-2';
     private readonly tableRoleArn = 'arn:aws:iam::020184830573:role/IibsAdminAccess-DO-NOT-DELETE';
     private dynamoDbClient: DynamoDBClient;
     constructor() {
         //ryantodo move this to a helper file and learn what catch does
         this.initialiseDynamoDbClient();
     }
-    private initialiseDynamoDbClient() {
-        /* const stsClient = new STSClient({ region: this.region });
-        const stsResponse = await stsClient.send(new AssumeRoleCommand({RoleArn:this.tableRoleArn, RoleSessionName:"Tablesession"}));
-        const dynamoDbCredentials = {
-            accessKeyId: stsResponse.Credentials!.AccessKeyId!,
-            secretAccessKey: stsResponse.Credentials!.SecretAccessKey!,
-            sessionToken: stsResponse.Credentials!.SessionToken!,
-        };*/
+    private async initialiseDynamoDbClient() {
         this.dynamoDbClient = new DynamoDBClient({
             region: this.region,
-            credentials: {
-                
-            },
         });
     }
     public async findAllDevices(): Promise<Device[]> {
