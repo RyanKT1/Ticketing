@@ -17,7 +17,8 @@ export class PipelineStack extends Stack {
            enableKeyRotation:true,
            synth: new ShellStep('Synth',{
                input:CodePipelineSource.gitHub('RyanKT1/Ticketing','main'),
-               commands:['npm install','npm run build','npx cdk synth']
+               commands:['npm install','npm run build','npm run cdk synth'],
+               primaryOutputDirectory: 'packages/cdk/cdk.out',
            })
        })
        const betaStage = pipeline.addStage(new PipelineStage(this,'beta',{
