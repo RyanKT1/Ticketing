@@ -3,7 +3,6 @@ import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { UsersModule } from './users/users.module';
 import { DevicesController } from './devices/devices.controller';
 import { DevicesService } from './devices/devices.service';
 import { DevicesModule } from './devices/devices.module';
@@ -13,7 +12,6 @@ import { DevicesRepository } from './devices/devices.repository';
 // short throttler means that no more than 3 requests per client in a second
 @Module({
     imports: [
-        UsersModule,
         DevicesModule,
         ThrottlerModule.forRoot([
             { name: 'short', ttl: 1000, limit: 3 },

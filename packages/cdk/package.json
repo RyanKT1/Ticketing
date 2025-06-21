@@ -13,7 +13,7 @@
     "watch": "tsc -w",
     "test": "jest",
     "cdk": "cdk",
-    "clean": "rm -rf cdk.out node_modules dist/*"
+    "clean": "rm -rf cdk.out node_modules dist"
   },
   "dependencies": {
     "aws-cdk-lib": "2.194.0",

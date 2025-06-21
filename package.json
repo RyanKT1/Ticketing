@@ -15,7 +15,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build":"npm run build --workspaces",
-    "cdk":"npm run cdk --workspace=cdk"
+    "cdk":"npm run cdk --workspace=cdk",
+    "clean": "npm run clean --workspaces && rm -rf node_modules"
   },
   "workspaces": [
     "packages/cdk",
