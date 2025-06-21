@@ -8,6 +8,8 @@ async function bootstrap() {
     app.useGlobalFilters(new ExceptionFilter(httpAdapter));
 
     // to enable cors for everyone do app.enableCors()
-    await app.listen(process.env.PORT ?? 3002);
+   await app.listen(process.env.PORT ?? 3002)
+ 
+
 }
 bootstrap();
