@@ -32,19 +32,19 @@ export class DevicesService {
 
     constructor(private readonly devicesRepository: DevicesRepository) {}
 
-    async findAllDevices(): Promise<ReturnType> {
+    async findAll(): Promise<ReturnType> {
         this.logger.log(`Retrieving all devices`);
-        const devices = await this.devicesRepository.findAllDevices();
+        const devices = await this.devicesRepository.findAll();
         return makeSuccessResponse(devices);
     }
 
-    async findOneDevice(id: string): Promise<ReturnType> {
+    async findOne(id: string): Promise<ReturnType> {
         this.logger.log(`Retrieving device with id: ${id}`);
-        const device = await this.devicesRepository.findOneDevice(id);
+        const device = await this.devicesRepository.findOne(id);
 
         return makeSuccessResponse(device);
     }
-    createDevice(createDeviceDto: CreateDeviceDto): ReturnType {
+    create(createDeviceDto: CreateDeviceDto): ReturnType {
         this.logger.log(`Creating new device`);
         const newDevice = {
             ...createDeviceDto,
@@ -52,9 +52,9 @@ export class DevicesService {
         this.devicesRepository.upsertOneDevice(Device.createDeviceInstanceFromDeviceDto(newDevice));
         return makeSuccessResponse();
     }
-    async updateDevice(id: string, updateDeviceDto: UpdateDeviceDto): Promise<ReturnType | undefined> {
+    async update(id: string, updateDeviceDto: UpdateDeviceDto): Promise<ReturnType | undefined> {
         this.logger.log(`Updating device with id: ${id}`);
-        const existingDevice = await this.devicesRepository.findOneDevice(id);
+        const existingDevice = await this.devicesRepository.findOne(id);
         if (existingDevice) {
             if (updateDeviceDto.name) {
                 existingDevice.name = updateDeviceDto.name;
@@ -73,7 +73,7 @@ export class DevicesService {
         this.logger.error(`Device with id: ${id} was not found.`);
         return undefined;
     }
-    deleteDevice(id: string): ReturnType {
+    delete(id: string): ReturnType {
         this.logger.log(`Deleting device with id: ${id}`);
         this.devicesRepository.deleteOneDevice(id);
         return makeSuccessResponse();

@@ -12,26 +12,26 @@ export class DevicesController {
     constructor(private readonly deviceService: DevicesService) {}
     // to remove throttler for this @SkipThrottle({ default: false })
     @Get()
-    findAllDevices() {
-        return this.deviceService.findAllDevices();
+    findAll() {
+        return this.deviceService.findAll();
     }
     @Get(':id')
-    findOneDevice(@Param('id', ParseUUIDPipe) id: string) {
-        return this.deviceService.findOneDevice(id); // return device[id]
+    findOne(@Param('id', ParseUUIDPipe) id: string) {
+        return this.deviceService.findOne(id); // return device[id]
     }
 
     @Post()
-    createDevice(@Body(ValidationPipe) createDeviceDto: CreateDeviceDto) {
-        return this.deviceService.createDevice(createDeviceDto);
+    create(@Body(ValidationPipe) createDeviceDto: CreateDeviceDto) {
+        return this.deviceService.create(createDeviceDto);
     }
 
     @Patch(':id')
-    updateDevice(@Param('id', ParseUUIDPipe) id: string, @Body(ValidationPipe) updateDeviceDto: UpdateDeviceDto) {
-        return this.deviceService.updateDevice(id, updateDeviceDto);
+    update(@Param('id', ParseUUIDPipe) id: string, @Body(ValidationPipe) updateDeviceDto: UpdateDeviceDto) {
+        return this.deviceService.update(id, updateDeviceDto);
     }
 
     @Delete(':id')
-    deleteDevice(@Param('id', ParseUUIDPipe) id: string) {
-        return this.deviceService.deleteDevice(id);
+    delete(@Param('id', ParseUUIDPipe) id: string) {
+        return this.deviceService.delete(id);
     }
 }

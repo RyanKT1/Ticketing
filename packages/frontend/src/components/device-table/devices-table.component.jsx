@@ -48,8 +48,6 @@ function DevicesTable ({ deviceList = [] }){
                 </tr>
             ))}
             <tr>                                                                                                                                                                                               
-                <td>hi</td>                                                   
-                <td>hi</td>
                 <td colSpan="4"></td>
             </tr>
         </tbody>

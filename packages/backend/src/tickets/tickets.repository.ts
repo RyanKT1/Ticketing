@@ -10,13 +10,12 @@ import {
     DeleteItemCommandOutput,
 } from '@aws-sdk/client-dynamodb';
 import { Injectable } from '@nestjs/common';
-import { Device } from './entity/device.entity';
+import { Ticket } from './entities/ticket.entity';
 
 @Injectable()
-export class DevicesRepository {
-    private readonly tableName = 'devices';
+export class TicketsRepository {
+    private readonly tableName = 'tickets';
     private readonly region = 'eu-west-2';
-    private readonly tableRoleArn = 'arn:aws:iam::020184830573:role/IibsAdminAccess-DO-NOT-DELETE';
     private dynamoDbClient: DynamoDBClient;
     constructor() {
         //ryantodo move this to a helper file and learn what catch does
@@ -27,8 +26,8 @@ export class DevicesRepository {
             region: this.region,
         });
     }
-    public async findAll(): Promise<Device[]> {
-        const devicesList: Device[] = [];
+    public async findAllTickets(): Promise<Ticket[]> {
+        const ticketsList: Ticket[] = [];
 
         const command = new ScanCommand({
             TableName: this.tableName,
@@ -36,54 +35,59 @@ export class DevicesRepository {
         const response = await this.dynamoDbClient.send(command);
 
         if (response.Items) {
-            // parse the result into an array and return it at devices
-            response.Items.map(device => {
-                devicesList.push(Device.createDeviceInstanceFromDynamoDbObject(device));
+            response.Items.map(ticket => {
+                ticketsList.push(Ticket.createTicketInstanceFromDynamoDbObject(ticket));
             });
         }
-        return devicesList;
+        return ticketsList;
     }
 
-    public async upsertOneDevice(device: Device): Promise<PutItemCommandOutput> {
+    public async upsertOneTicket(ticket: Ticket): Promise<PutItemCommandOutput> {
         // combination of both create and update method
-        const deviceObject: Record<string, AttributeValue> = {
+        const ticketObject: Record<string, AttributeValue> = {
             id: {
-                S: device.id,
+                S: ticket.id,
             },
         };
-        if (device.manufacturer) {
-            deviceObject.manufacturer = {
-                S: device.manufacturer,
+        if (ticket.deviceName) {
+            ticketObject.deviceName = {
+                S: ticket.deviceName,
             };
         }
-        if (device.model) {
-            deviceObject.model = {
-                S: device.model,
+        if (ticket.ticketOwner) {
+            ticketObject.ticketOwner = {
+                S: ticket.ticketOwner,
             };
         }
-        if (device.name) {
-            deviceObject.name = {
-                S: device.name,
+        if (ticket.ticketDescription) {
+            ticketObject.ticketDescription = {
+                S: ticket.ticketDescription,
             };
         }
-        if (device.updatedAt) {
-            deviceObject.updatedAt = {
-                S: String(device.updatedAt),
+        if (ticket.updatedAt) {
+            ticketObject.updatedAt = {
+                S: String(ticket.updatedAt),
             };
         }
-        if (device.createdAt) {
-            deviceObject.createdAt = {
-                S: String(device.createdAt),
+        if (ticket.createdAt) {
+            ticketObject.createdAt = {
+                S: String(ticket.createdAt),
             };
         }
+        if (ticket.resolved) {
+            ticketObject.resolved = {
+                BOOL: Boolean(ticket.resolved),
+            };
+        }
+         
         const command = new PutItemCommand({
             TableName: this.tableName,
-            Item: deviceObject,
+            Item: ticketObject,
         });
         return await this.dynamoDbClient.send(command);
     }
 
-    public async findOne(id: string): Promise<Device | undefined> {
+    public async findOneTicket(id: string): Promise<Ticket | undefined> {
         const command = new GetItemCommand({
             TableName: this.tableName,
             Key: {
@@ -94,12 +98,12 @@ export class DevicesRepository {
         });
         const response = await this.dynamoDbClient.send(command);
         if (response.Item) {
-            return Device.createDeviceInstanceFromDynamoDbObject(response.Item);
+            return Ticket.createTicketInstanceFromDynamoDbObject(response.Item);
         }
         return undefined;
     }
 
-    public async deleteOneDevice(id: string): Promise<DeleteItemCommandOutput> {
+    public async deleteOneTicket(id: string): Promise<DeleteItemCommandOutput> {
         const command = new DeleteItemCommand({
             TableName: this.tableName,
             Key: {

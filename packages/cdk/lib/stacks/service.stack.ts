@@ -1,13 +1,13 @@
 
 import { RemovalPolicy, Stack, StackProps } from 'aws-cdk-lib';
-import { AccessLogFormat, Deployment, LambdaRestApi, LogGroupLogDestination, MethodLoggingLevel } from 'aws-cdk-lib/aws-apigateway';
-import { Certificate, CertificateValidation, DnsValidatedCertificate } from 'aws-cdk-lib/aws-certificatemanager';
-import { AllowedMethods, Distribution, OriginAccessIdentity, SSLMethod, ViewerProtocolPolicy } from 'aws-cdk-lib/aws-cloudfront';
-import { S3BucketOrigin, S3StaticWebsiteOrigin } from 'aws-cdk-lib/aws-cloudfront-origins';
+import { AccessLogFormat, Deployment, LambdaRestApi, LogGroupLogDestination } from 'aws-cdk-lib/aws-apigateway';
+//import { Certificate, CertificateValidation } from 'aws-cdk-lib/aws-certificatemanager';
+import { Distribution, ViewerProtocolPolicy } from 'aws-cdk-lib/aws-cloudfront';
+import { S3BucketOrigin } from 'aws-cdk-lib/aws-cloudfront-origins';
 import { AttributeType, Table } from 'aws-cdk-lib/aws-dynamodb';
 import { Code, Function, Runtime } from 'aws-cdk-lib/aws-lambda';
 import { LogGroup } from 'aws-cdk-lib/aws-logs';
-import { ARecord, HostedZone, RecordTarget } from 'aws-cdk-lib/aws-route53';
+import { ARecord, PublicHostedZone, RecordTarget } from 'aws-cdk-lib/aws-route53';
 import { CloudFrontTarget } from 'aws-cdk-lib/aws-route53-targets';
 import { Bucket } from 'aws-cdk-lib/aws-s3';
 import { BucketDeployment, Source } from 'aws-cdk-lib/aws-s3-deployment';
@@ -38,7 +38,14 @@ export class ServiceStack extends Stack {
         type: AttributeType.STRING
     }
   })
+   const ticketsTable = new Table(this,'tickets',{
+    partitionKey:{
+        name:'id',
+        type: AttributeType.STRING
+    }
+  })
   devicesTable.grantReadWriteData(ticketingLambda)
+  ticketsTable.grantReadWriteData(ticketingLambda)
     // CREATE S3 , CLOUDFRONT , ROUTE53 , apigateway and acm 
   const hostBucket = new Bucket(this,'HostBucket',{
     bucketName:domainName,
@@ -49,20 +56,20 @@ export class ServiceStack extends Stack {
     autoDeleteObjects:true,
     enforceSSL:true
   })
-  const zone = new HostedZone(this,'zone',{
+  const zone = new PublicHostedZone(this,'zone',{
     zoneName:domainName
   })
 
 
-
+/*
   const certificate = new Certificate(this,'Certificate',{
     domainName: domainName,
     validation: CertificateValidation.fromDns(zone),
   })
-
+*/
 
   const ticketingDistribution = new Distribution(this,`${props.stageName}-Ticketing-Distribution`,{
-    certificate: certificate,
+    //certificate: certificate,
     defaultBehavior:{
       origin: S3BucketOrigin.withOriginAccessControl(hostBucket),
       viewerProtocolPolicy: ViewerProtocolPolicy.REDIRECT_TO_HTTPS,

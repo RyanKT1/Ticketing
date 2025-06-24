@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { getDevices } from "../services/device.services";
-import DevicesTable from "../components/devices-table.component";
+import DevicesTable from "../components/device-table/devices-table.component";
 
 function DevicePage() {
     const [devices, setDevices] = useState([]);
