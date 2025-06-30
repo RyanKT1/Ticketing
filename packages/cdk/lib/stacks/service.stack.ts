@@ -1,7 +1,7 @@
 
 import { RemovalPolicy, Stack, StackProps } from 'aws-cdk-lib';
 import { AccessLogFormat, Deployment, LambdaRestApi, LogGroupLogDestination } from 'aws-cdk-lib/aws-apigateway';
-//import { Certificate, CertificateValidation } from 'aws-cdk-lib/aws-certificatemanager';
+import { Certificate, CertificateValidation } from 'aws-cdk-lib/aws-certificatemanager';
 import { Distribution, ViewerProtocolPolicy } from 'aws-cdk-lib/aws-cloudfront';
 import { S3BucketOrigin } from 'aws-cdk-lib/aws-cloudfront-origins';
 import { AttributeType, Table } from 'aws-cdk-lib/aws-dynamodb';
@@ -30,15 +30,18 @@ export class ServiceStack extends Stack {
   runtime: Runtime.NODEJS_18_X,
   handler: 'dist/lambda.handler', 
   code: Code.fromAsset(lambdaPath),
+  functionName:"TicketingLambda"
     }); 
 
     const devicesTable = new Table(this,'devices',{
+    tableName:'devices',
     partitionKey:{
         name:'id',
         type: AttributeType.STRING
     }
   })
    const ticketsTable = new Table(this,'tickets',{
+    tableName:'tickets',
     partitionKey:{
         name:'id',
         type: AttributeType.STRING
@@ -57,19 +60,21 @@ export class ServiceStack extends Stack {
     enforceSSL:true
   })
   const zone = new PublicHostedZone(this,'zone',{
-    zoneName:domainName
+    zoneName:domainName,
+    
   })
 
 
-/*
+
   const certificate = new Certificate(this,'Certificate',{
     domainName: domainName,
     validation: CertificateValidation.fromDns(zone),
+    certificateName:"Certificate"
   })
-*/
+
 
   const ticketingDistribution = new Distribution(this,`${props.stageName}-Ticketing-Distribution`,{
-    //certificate: certificate,
+    certificate: certificate,
     defaultBehavior:{
       origin: S3BucketOrigin.withOriginAccessControl(hostBucket),
       viewerProtocolPolicy: ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
@@ -92,6 +97,7 @@ export class ServiceStack extends Stack {
 
   
   const ticketingApiGateway = new LambdaRestApi(this,'TicketingApi',{
+    restApiName:'TicketingApi',
     handler:ticketingLambda,
     proxy:true,
     cloudWatchRole:true,
