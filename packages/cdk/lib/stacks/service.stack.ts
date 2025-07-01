@@ -107,14 +107,6 @@ export class ServiceStack extends Stack {
     }
   })
 
-
-
- new Deployment(this,'Ticketing-Deployment',{
-    api:ticketingApiGateway,
-    stageName: props.stageName
-  })
-
-
   }
  
 }
