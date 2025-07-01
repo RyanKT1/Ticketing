@@ -19,7 +19,7 @@ interface ServiceStackProps extends StackProps {
   stageName: string
 }
 
-const lambdaPath = path.resolve(__dirname, '../../../backend');
+const lambdaPath = path.join(__dirname, '../../../../packages/backend');
 
 export class ServiceStack extends Stack {
   constructor(scope: Construct, id: string, props: ServiceStackProps) {
@@ -49,47 +49,45 @@ export class ServiceStack extends Stack {
   })
   devicesTable.grantReadWriteData(ticketingLambda)
   ticketsTable.grantReadWriteData(ticketingLambda)
-    // CREATE S3 , CLOUDFRONT , ROUTE53 , apigateway and acm 
+
   const hostBucket = new Bucket(this,'HostBucket',{
     bucketName:domainName,
     versioned:true,
-    websiteIndexDocument:'index.html',
     publicReadAccess:false,
     removalPolicy: RemovalPolicy.DESTROY,
     autoDeleteObjects:true,
     enforceSSL:true
   })
+  /*
   const zone = new PublicHostedZone(this,'zone',{
     zoneName:domainName,
     
   })
 
+*/
 
-
-  const certificate = new Certificate(this,'Certificate',{
+ /* const certificate = new Certificate(this,'Certificate',{
     domainName: domainName,
     validation: CertificateValidation.fromDns(zone),
     certificateName:"Certificate"
   })
-
+*/
 
   const ticketingDistribution = new Distribution(this,`${props.stageName}-Ticketing-Distribution`,{
-    certificate: certificate,
     defaultBehavior:{
       origin: S3BucketOrigin.withOriginAccessControl(hostBucket),
       viewerProtocolPolicy: ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
     },
-    domainNames:[domainName]
   
   })
-    new ARecord(this, 'AliasRecord',{
+   /* new ARecord(this, 'AliasRecord',{
       recordName:domainName,
       zone:zone,
       target:RecordTarget.fromAlias(new CloudFrontTarget(ticketingDistribution))
 
-    })
+    })*/
     new BucketDeployment(this,'BucketDeployment',{
-      sources:[Source.asset('../frontend/dist')],
+      sources:[Source.asset(path.join(__dirname, '../../../../packages/frontend/dist'))],
       destinationBucket:hostBucket,
       distribution:ticketingDistribution,
       distributionPaths:['/*']
