@@ -1,57 +1,58 @@
 import Table from 'react-bootstrap/Table';
-import Button from 'react-bootstrap/Button';
+import EditableRow from '../editable-row/editable-row.component';
+import ReadonlyRow from '../readonly-row/readonly-row.component';
+import { Fragment } from 'react';
+import { Form } from 'react-bootstrap';
 
-function DevicesTable ({ deviceList = [] }){
-    //only createticketclick should be available to regular customers 
-    console.log(deviceList);
-    function createTicketClick(device){
-        console.log("Create ticket for:", device);
-    }
-
-    function deleteDeviceClick(device){
-        console.log("Delete device:", device);
-    }
-    
-    function modifyDeviceClick(device){
-        console.log("Modify device:", device);
-    }
-    
-    function createDeviceClick(){
-        
-    }
+function DevicesTable ({ 
+    deviceList = [],
+    editDeviceRow,
+    editFormData,
+    handleDeleteDevice,
+    handleUpdateClick,
+    handleEditInputChange,
+    handleEditFormSubmit,
+    handleCancelClick,
+    handleCreateTicket
+}){
     
     return (
-        <Table>
-        <thead>
-            <tr>
-            <th>Name</th>
-            <th>Manufacturer</th>
-            <th>Model</th>
-            <th>Created At</th>
-            <th>Updated At</th>
-            <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-            {deviceList && deviceList.map(device => (
-                <tr key={device.name}>
-                    <td>{device.name}</td>
-                    <td>{device.manufacturer}</td>
-                    <td>{device.model}</td>
-                    <td>{device.createdAt}</td>
-                    <td>{device.updatedAt}</td>
-                    <td>
-                        <Button variant="primary" size="sm" onClick={() => createTicketClick(device)}>Create Ticket</Button>
-                        <Button variant="primary" size="sm" onClick={() => modifyDeviceClick(device)}>Modify Device</Button>
-                        <Button variant="primary" size="sm" onClick={() => deleteDeviceClick(device)}>Delete </Button>
-                    </td>
-                </tr>
-            ))}
-            <tr>                                                                                                                                                                                               
-                <td colSpan="4"></td>
-            </tr>
-        </tbody>
-        </Table>
+        <Form onSubmit={handleEditFormSubmit}>
+            <Table>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Manufacturer</th>
+                        <th>Model</th>
+                        <th>Created At</th>
+                        <th>Updated At</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {deviceList && deviceList.map(device => (
+                        <Fragment key={device.id}>
+                            {editDeviceRow === device.id ? 
+                                <EditableRow 
+                                    editFormData={editFormData} 
+                                    handleEditInputChange={handleEditInputChange} 
+                                    handleCancelClick={handleCancelClick}
+                                /> : 
+                                <ReadonlyRow 
+                                    device={device} 
+                                    handleDeleteDevice={handleDeleteDevice} 
+                                    handleUpdateDevice={handleUpdateClick} 
+                                    handleCreateTicket={handleCreateTicket}
+                                />
+                            }
+                        </Fragment>
+                    ))}
+                    <tr key="empty-row">                                                                                                                                                                                               
+                        <td colSpan="6"></td>
+                    </tr>
+                </tbody>
+            </Table>
+        </Form>
     )
 }
 

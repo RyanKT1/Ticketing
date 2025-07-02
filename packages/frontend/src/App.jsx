@@ -1,18 +1,17 @@
-import { useState } from 'react'
-import Button from 'react-bootstrap/Button';
+import CreateTicketPage from './pages/create-ticket.page';
 import DevicePage from './pages/device-table.page';
 import { Route, Routes } from 'react-router-dom';
-import { Header } from './components/header/header.component';
+
 
 
 function App() {
 
   return (
     <>
-
       <main className='main-content'>
       
         <Routes>
+          <Route path="/ticket/create" element={<CreateTicketPage/>}/>
             <Route path="/" element={<DevicePage/>}/>
         </Routes>
             

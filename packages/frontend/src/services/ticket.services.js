@@ -1,8 +1,8 @@
 const BASE_URL = 'https://3h8nlg6y5l.execute-api.eu-west-2.amazonaws.com'
-//const DEV_BASE_URL = 'http://localhost:3003'
-export const getDevices = async () => {
+
+export const getTickets = async () => {
     try {
-        const response = await fetch(`${BASE_URL}/devices`, {
+        const response = await fetch(`${BASE_URL}/tickets`, {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
@@ -13,25 +13,25 @@ export const getDevices = async () => {
         if (!response.ok) {
             throw new Error(`HTTP error! Status: ${response.status}`);
         }
-
+        
         const data = await response.json();
-        return data;
+        return data.results;
     } catch (error) {
-        console.error('Error fetching devices:', error);
+        console.error('Error fetching tickets:', error);
         // error modal
         return [];
     }
 }
 
-export const createDevice = async (createDeviceParams) => {
+export const createTicket = async (createTicketParams) => {
     try {
-        const response = await fetch(`${BASE_URL}/devices/create`, {
+        const response = await fetch(`${BASE_URL}/tickets/create`, {
             method: 'POST',
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify(createDeviceParams)
+            body: JSON.stringify(createTicketParams)
         });
         
         if (!response.ok) {
@@ -39,17 +39,17 @@ export const createDevice = async (createDeviceParams) => {
         }
         
         const data = await response.json();
-        return data;
+        return data.results;
     } catch (error) {
-        console.error('Error creating device:', error);
+        console.error('Error creating ticket:', error);
         // error modal
         throw error;
     }
 }
 
-export const deleteDevice = async (id) => {
+export const deleteTicket = async (id) => {
     try {
-        const response = await fetch(`${BASE_URL}/devices/id=${encodeURIComponent(id)}`, {
+        const response = await fetch(`${BASE_URL}/tickets/id=${encodeURIComponent(id)}`, {
             method: "DELETE",
             headers: {
                 'Accept': 'application/json',
@@ -64,15 +64,15 @@ export const deleteDevice = async (id) => {
         const data = await response.json();
         return data.results;
     } catch (error) {
-        console.error(`Error deleting device with id ${id}:`, error);
+        console.error(`Error deleting ticket with id ${id}:`, error);
         // error modal
         throw error;
     }
 }
 
-export const getDevice = async (id) => {
+export const getTicket = async (id) => {
     try {
-        const response = await fetch(`${BASE_URL}/devices/id=${encodeURIComponent(id)}`, {
+        const response = await fetch(`${BASE_URL}/tickets/id=${encodeURIComponent(id)}`, {
             method: "GET",
             headers: {
                 'Accept': 'application/json',
@@ -87,21 +87,21 @@ export const getDevice = async (id) => {
         const data = await response.json();
         return data.results;
     } catch (error) {
-        console.error(`Error fetching device with id ${id}:`, error);
+        console.error(`Error fetching ticket with id ${id}:`, error);
         // error modal
         return null;
     }
 }
 
-export const updateDevice = async (id, updateDeviceParams) => {
+export const updateTicket = async (id, updateTicketParams) => {
     try {
-        const response = await fetch(`${BASE_URL}/devices/id=${encodeURIComponent(id)}`, {
+        const response = await fetch(`${BASE_URL}/tickets/id=${encodeURIComponent(id)}`, {
             method: "PATCH",
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify(updateDeviceParams)
+            body: JSON.stringify(updateTicketParams)
         });
         
         if (!response.ok) {
@@ -111,7 +111,7 @@ export const updateDevice = async (id, updateDeviceParams) => {
         const data = await response.json();
         return data.results;
     } catch (error) {
-        console.error(`Error updating device with id ${id}:`, error);
+        console.error(`Error updating ticket with id ${id}:`, error);
         // error modal
         throw error;
     }

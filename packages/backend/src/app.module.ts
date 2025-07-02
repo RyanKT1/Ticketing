@@ -7,6 +7,9 @@ import { DevicesModule } from './devices/devices.module';
 import { DevicesRepository } from './devices/devices.repository';
 import { TicketsModule } from './tickets/tickets.module';
 import { MessagesModule } from './messages/messages.module';
+import { TicketsController } from './tickets/tickets.controller';
+import { TicketsService } from './tickets/tickets.service';
+import { TicketsRepository } from './tickets/tickets.repository';
 
 //throttler is used for rate limiting to maximise the amount of requests that can be made in a minute
 // short throttler means that no more than 3 requests per client in a second
@@ -18,9 +21,14 @@ import { MessagesModule } from './messages/messages.module';
             { name: 'long', ttl: 60000, limit: 100 },
         ]),
         TicketsModule,
-        MessagesModule,
     ],
-    controllers: [DevicesController],
-    providers: [DevicesService, DevicesRepository, { provide: APP_GUARD, useClass: ThrottlerGuard }],
+    controllers: [DevicesController, TicketsController],
+    providers: [
+        DevicesService,
+        DevicesRepository,
+        TicketsService,
+        TicketsRepository,
+        { provide: APP_GUARD, useClass: ThrottlerGuard },
+    ],
 })
 export class AppModule {}

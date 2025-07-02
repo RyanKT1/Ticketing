@@ -78,7 +78,7 @@ export class ServiceStack extends Stack {
       origin: S3BucketOrigin.withOriginAccessControl(hostBucket),
       viewerProtocolPolicy: ViewerProtocolPolicy.REDIRECT_TO_HTTPS,
     },
-  
+    defaultRootObject:"index.html"
   })
    /* new ARecord(this, 'AliasRecord',{
       recordName:domainName,

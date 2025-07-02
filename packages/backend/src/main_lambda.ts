@@ -12,6 +12,7 @@ async function bootstrap(): Promise<Handler> {
 
     // to enable cors for everyone do app.enableCors()
     await app.init();
+    app.enableCors();
     const expressApp = app.getHttpAdapter().getInstance();
     return serverlessExpress({ app: expressApp });
 }
