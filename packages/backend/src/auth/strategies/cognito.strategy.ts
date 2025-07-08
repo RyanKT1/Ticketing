@@ -6,8 +6,8 @@ import { passportJwtSecret } from 'jwks-rsa';
 @Injectable()
 export class CognitoStrategy extends PassportStrategy(Strategy, 'cognito') {
   constructor() {
-    const userPoolId = process.env.COGNITO_USER_POOL_ID || '';
-    const clientId = process.env.COGNITO_APP_CLIENT_ID || '';
+    const userPoolId = process.env.COGNITO_USER_POOL_ID || 'eu-west-2_mCkMgiuT8';
+    const clientId = process.env.COGNITO_APP_CLIENT_ID || '4ljm4p4e4il0me3ocuas5d9r3n';
     
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),

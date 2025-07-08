@@ -1,6 +1,6 @@
 import { useAuth } from 'react-oidc-context';
 
-const BASE_URL = true ? 'https://3h8nlg6y5l.execute-api.eu-west-2.amazonaws.com': 'http://localhost:3003'
+const BASE_URL = true ? 'https://wgwbl1gq7b.execute-api.eu-west-2.amazonaws.com/beta': 'http://localhost:3003'
 
 const getAuthHeaders = (auth) => {
     return {
