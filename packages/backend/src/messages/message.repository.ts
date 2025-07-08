@@ -17,7 +17,7 @@ import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 export class MessagesRepository {
     private readonly tableName = 'messages';
     private readonly region = 'eu-west-2';
-    private readonly bucketName = 'beta-TicketingMessageBucket'
+    private readonly bucketName = 'beta-ticketingmessagebucket'
     private dynamoDbClient: DynamoDBClient;
     private s3Client :S3Client
     constructor() {

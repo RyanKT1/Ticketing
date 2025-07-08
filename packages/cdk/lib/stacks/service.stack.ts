@@ -73,7 +73,7 @@ export class ServiceStack extends Stack {
     enforceSSL:true
   })
  new Bucket(this,'MessagesBucket',{
-    bucketName:`${props.stageName}-TicketingMessageBucket`,
+    bucketName:`${props.stageName}-ticketingmessagebucket`,
     versioned:true,
     publicReadAccess:false,
     removalPolicy: RemovalPolicy.DESTROY,
