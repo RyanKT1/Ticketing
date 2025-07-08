@@ -1,21 +1,29 @@
-const BASE_URL = 'https://3h8nlg6y5l.execute-api.eu-west-2.amazonaws.com'
+import { useAuth } from 'react-oidc-context';
+
+const BASE_URL = true ? 'https://3h8nlg6y5l.execute-api.eu-west-2.amazonaws.com': 'http://localhost:3003'
+
+const getAuthHeaders = (auth) => {
+    return {
+        'Authorization': `Bearer ${auth.user?.access_token}`,
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+    };
+};
 
 export const getTickets = async () => {
+   const auth = useAuth();
+
     try {
         const response = await fetch(`${BASE_URL}/tickets`, {
             method: 'GET',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            }
+            headers: getAuthHeaders(auth)
         });
         
         if (!response.ok) {
             throw new Error(`HTTP error! Status: ${response.status}`);
         }
-        
         const data = await response.json();
-        return data.results;
+        return data;
     } catch (error) {
         console.error('Error fetching tickets:', error);
         // error modal
@@ -24,13 +32,12 @@ export const getTickets = async () => {
 }
 
 export const createTicket = async (createTicketParams) => {
+   const auth = useAuth();
+
     try {
         const response = await fetch(`${BASE_URL}/tickets/create`, {
             method: 'POST',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            },
+            headers: getAuthHeaders(auth),
             body: JSON.stringify(createTicketParams)
         });
         
@@ -48,13 +55,12 @@ export const createTicket = async (createTicketParams) => {
 }
 
 export const deleteTicket = async (id) => {
+   const auth = useAuth();
+
     try {
         const response = await fetch(`${BASE_URL}/tickets/id=${encodeURIComponent(id)}`, {
             method: "DELETE",
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            }
+            headers: getAuthHeaders(auth)
         });
         
         if (!response.ok) {
@@ -71,13 +77,12 @@ export const deleteTicket = async (id) => {
 }
 
 export const getTicket = async (id) => {
+   const auth = useAuth();
+
     try {
         const response = await fetch(`${BASE_URL}/tickets/id=${encodeURIComponent(id)}`, {
             method: "GET",
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            }
+            headers: getAuthHeaders(auth)
         });
         
         if (!response.ok) {
@@ -94,13 +99,12 @@ export const getTicket = async (id) => {
 }
 
 export const updateTicket = async (id, updateTicketParams) => {
+   const auth = useAuth();
+
     try {
         const response = await fetch(`${BASE_URL}/tickets/id=${encodeURIComponent(id)}`, {
             method: "PATCH",
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            },
+            headers: getAuthHeaders(auth),
             body: JSON.stringify(updateTicketParams)
         });
         

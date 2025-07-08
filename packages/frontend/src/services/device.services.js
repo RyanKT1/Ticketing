@@ -1,13 +1,23 @@
-const BASE_URL = 'https://3h8nlg6y5l.execute-api.eu-west-2.amazonaws.com'
+import { useAuth } from 'react-oidc-context';
+
+const BASE_URL = true ? 'https://3h8nlg6y5l.execute-api.eu-west-2.amazonaws.com': 'http://localhost:3003'
 //const DEV_BASE_URL = 'http://localhost:3003'
+
+const getAuthHeaders = (auth) => {
+    return {
+        'Authorization': `Bearer ${auth.user?.access_token}`,
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+    };
+};
+
 export const getDevices = async () => {
+  const auth = useAuth();
+
     try {
         const response = await fetch(`${BASE_URL}/devices`, {
             method: 'GET',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            }
+            headers: getAuthHeaders(auth)
         });
         
         if (!response.ok) {
@@ -24,13 +34,11 @@ export const getDevices = async () => {
 }
 
 export const createDevice = async (createDeviceParams) => {
+  const auth = useAuth();
     try {
         const response = await fetch(`${BASE_URL}/devices/create`, {
             method: 'POST',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            },
+            headers: getAuthHeaders(auth),
             body: JSON.stringify(createDeviceParams)
         });
         
@@ -48,13 +56,11 @@ export const createDevice = async (createDeviceParams) => {
 }
 
 export const deleteDevice = async (id) => {
+  const auth = useAuth();
     try {
         const response = await fetch(`${BASE_URL}/devices/id=${encodeURIComponent(id)}`, {
             method: "DELETE",
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            }
+            headers: getAuthHeaders(auth)
         });
         
         if (!response.ok) {
@@ -71,13 +77,11 @@ export const deleteDevice = async (id) => {
 }
 
 export const getDevice = async (id) => {
+  const auth = useAuth();
     try {
         const response = await fetch(`${BASE_URL}/devices/id=${encodeURIComponent(id)}`, {
             method: "GET",
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            }
+            headers: getAuthHeaders(auth)
         });
         
         if (!response.ok) {
@@ -94,13 +98,11 @@ export const getDevice = async (id) => {
 }
 
 export const updateDevice = async (id, updateDeviceParams) => {
+  const auth = useAuth();
     try {
         const response = await fetch(`${BASE_URL}/devices/id=${encodeURIComponent(id)}`, {
             method: "PATCH",
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            },
+            headers: getAuthHeaders(auth),
             body: JSON.stringify(updateDeviceParams)
         });
         

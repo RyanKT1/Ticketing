@@ -1,34 +1,33 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete, UseInterceptors, UploadedFile, UseGuards, Request } from '@nestjs/common';
 import { MessagesService } from './messages.service';
 import { CreateMessageDto } from './dto/create-message.dto';
-import { UpdateMessageDto } from './dto/update-message.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 @Controller('messages')
 export class MessagesController {
-  constructor(private readonly messagesService: MessagesService) {}
+    constructor(private readonly messagesService: MessagesService) {}
 
-  @Post()
-  create(@Body() createMessageDto: CreateMessageDto) {
-    return this.messagesService.create(createMessageDto);
-  }
+    @Post()
+    @UseGuards(JwtAuthGuard)
+    @UseInterceptors(FileInterceptor('file'))
+    create(@Body() createMessageDto: CreateMessageDto, @UploadedFile() file:Express.Multer.File, @Request() req) {
+        const isAdmin = req.user.groups.includes('Admins');
+        createMessageDto.sentBy = req.user.username;
+        return this.messagesService.create(createMessageDto, file,isAdmin);
+    }
 
-  @Get()
-  findAll() {
-    return this.messagesService.findAll();
-  }
+    @Get(':ticketId')
+    @UseGuards(JwtAuthGuard)
+    findAllByTicketId(@Param('ticketId') ticketId: string, @Request() req) {
+        const isAdmin = req.user.groups.includes('Admins');
+        return this.messagesService.findAll(ticketId, req.user.username, isAdmin);
+    }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.messagesService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateMessageDto: UpdateMessageDto) {
-    return this.messagesService.update(+id, updateMessageDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.messagesService.remove(+id);
-  }
+    @Delete(':id')
+    @UseGuards(JwtAuthGuard)
+    remove(@Param('id') id: string, @Request() req) {
+        const isAdmin = req.user.groups.includes('Admins');
+        return this.messagesService.remove(id, req.user.username, isAdmin);
+    }
 }

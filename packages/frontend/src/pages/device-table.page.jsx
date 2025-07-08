@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { getDevices, deleteDevice, updateDevice } from "../services/device.services";
 import DevicesTable from "../components/device-table/devices-table.component";
 
-function DevicePage() {
+function DeviceTablePage() {
     
     const [devices, setDevices] = useState([]);
     const [editDeviceRow, setEditDeviceRow] = useState(null);
@@ -125,4 +125,4 @@ function DevicePage() {
     );
 }
 
-export default DevicePage;
+export default DeviceTablePage;

@@ -16,7 +16,6 @@ import { Device } from './entity/device.entity';
 export class DevicesRepository {
     private readonly tableName = 'devices';
     private readonly region = 'eu-west-2';
-    private readonly tableRoleArn = 'arn:aws:iam::020184830573:role/IibsAdminAccess-DO-NOT-DELETE';
     private dynamoDbClient: DynamoDBClient;
     constructor() {
         //ryantodo move this to a helper file and learn what catch does

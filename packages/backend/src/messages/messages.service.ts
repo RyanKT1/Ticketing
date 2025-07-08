@@ -1,26 +1,75 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { CreateMessageDto } from './dto/create-message.dto';
-import { UpdateMessageDto } from './dto/update-message.dto';
+import { MessagesRepository } from './message.repository';
+import { Message } from './entities/message.entity';
+import { TicketsService } from '../tickets/tickets.service';
 
 @Injectable()
 export class MessagesService {
-  create(createMessageDto: CreateMessageDto) {
-    return 'This action adds a new message';
-  }
+    private readonly logger = new Logger(MessagesService.name);
+    constructor(
+        private readonly messagesRepository: MessagesRepository,
+        private readonly ticketsService: TicketsService
+    ) {}
 
-  findAll() {
-    return `This action returns all messages`;
-  }
+    async create(createMessageDto: CreateMessageDto,file:Express.Multer.File, isAdmin: boolean):Promise<Boolean> {
+        const ticket = await this.ticketsService.findOne(createMessageDto.ticketId, createMessageDto.sentBy, isAdmin);
 
-  findOne(id: number) {
-    return `This action returns a #${id} message`;
-  }
+        if (!ticket) {
+            return ticket;
+        }
 
-  update(id: number, updateMessageDto: UpdateMessageDto) {
-    return `This action updates a #${id} message`;
-  }
+        this.logger.log(`Creating new message`);
+        const newMessage = {
+            ...createMessageDto,
+        };
+        this.messagesRepository.upsertOneMessage(Message.createMessageInstanceFromTicketDto(newMessage));
+        this.messagesRepository.uploadAttachment(`${newMessage.ticketId}/${newMessage.fileName}`,file)
+        this.logger.log('Created Ticket')
+        return true;
+    }
+ 
+    
+    async findAll(ticketId: string, username: string, isAdmin: boolean) :Promise<Message[]|Boolean> {
+        this.logger.log(`Retrieving all messages for ticket: ${ticketId}`);
+        
+    
+        const ticket = await this.ticketsService.findOne(ticketId, username, isAdmin);
+        
+        if (!ticket) {
+            return ticket
+        }
+        
+        const messages = await this.messagesRepository.findAllMessages(ticketId);
+        
+        messages.map(async (message) => {
+            if (message.fileName) {
+                message.s3Link = await this.messagesRepository.getAttachmentLink(`${message.ticketId}/${message.fileName}`);
+            }
+        });
+        
+        return messages;
+    }
 
-  remove(id: number) {
-    return `This action removes a #${id} message`;
-  }
+    async remove(id: string, username: string, isAdmin: boolean): Promise<Boolean> {
+        this.logger.log(`Deleting message with id: ${id}`);
+        const message = await this.messagesRepository.findOneMessage(id);
+        
+        if (!message) {
+            this.logger.log(`Message with id ${id} not found`)
+            return false;
+        }
+        
+        if (isAdmin || message.sentBy === username) {
+            if (message.fileName) {
+                await this.messagesRepository.deleteAttachment(`${message.ticketId}/${message.fileName}`);
+            }
+            this.messagesRepository.deleteOneMessage(id);
+            this.logger.log(`Successfully removed message #${id}`)
+            return true;
+        } else {
+            this.logger.log(`Not authorized to delete message #${id}`)
+            return false ;
+        }
+    }
 }

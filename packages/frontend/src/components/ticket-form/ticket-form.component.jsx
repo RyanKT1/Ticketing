@@ -1,11 +1,13 @@
-import { Form, Button } from "react-bootstrap";
+import { Form, Button, Row, Col } from "react-bootstrap";
 
 function TicketForm({ 
     formData, 
     errors, 
     handleSubmit, 
     handleInputChange, 
-    handleSelectChange 
+    handleSelectChange,
+    isEditMode = false,
+    onCancel
 }) {
     
     return (
@@ -98,9 +100,33 @@ function TicketForm({
                 </Form.Control.Feedback>
            </Form.Group>
 
-           <Button variant="primary" type="submit">
-                Create Ticket
-           </Button>
+           <Form.Group className="mb-3" controlId="resolved">
+                <Form.Check 
+                    type="checkbox"
+                    label="Mark as Resolved"
+                    checked={formData.resolved || false}
+                    onChange={(e) => {
+                        const event = {
+                            target: {
+                                id: 'resolved',
+                                value: e.target.checked
+                            }
+                        };
+                        handleInputChange(event);
+                    }}
+                />
+           </Form.Group>
+
+           <div className="d-flex justify-content-between">
+                {isEditMode && (
+                    <Button variant="secondary" onClick={onCancel}>
+                        Cancel
+                    </Button>
+                )}
+                <Button variant="primary" type="submit" className={isEditMode ? "ms-auto" : ""}>
+                    {isEditMode ? 'Update Ticket' : 'Create Ticket'}
+                </Button>
+           </div>
         </Form>
     );
 }

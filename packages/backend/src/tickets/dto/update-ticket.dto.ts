@@ -1,11 +1,9 @@
-import { PartialType ,IntersectionType} from '@nestjs/mapped-types';
+import { PartialType, IntersectionType } from '@nestjs/mapped-types';
 import { CreateTicketDto } from './create-ticket.dto';
 import { IsBoolean } from 'class-validator';
 
-class AdditionalTicketInfo{
+class AdditionalTicketInfo {
     @IsBoolean()
-    resolved:boolean
+    resolved: boolean;
 }
-export class UpdateTicketDto extends PartialType(IntersectionType(CreateTicketDto,AdditionalTicketInfo)) {
-   
-}
+export class UpdateTicketDto extends PartialType(IntersectionType(CreateTicketDto, AdditionalTicketInfo)) {}

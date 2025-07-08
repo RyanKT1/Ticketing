@@ -1,0 +1,316 @@
+.ticketInfoContainer {
+  background-color: white;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.ticketHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.ticketHeader h2 {
+  margin: 0;
+  color: #343a40;
+  font-weight: 600;
+}
+
+.ticketActions {
+  display: flex;
+  gap: 8px;
+}
+
+.actionButton {
+  min-width: 80px;
+}
+
+.ticketDetails {
+  padding: 24px;
+  background-color: white;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.detailRow {
+  display: flex;
+  margin-bottom: 12px;
+  align-items: baseline;
+}
+
+.fullWidth {
+  grid-column: 1 / -1;
+}
+
+.detailLabel {
+  font-weight: 600;
+  color: #6c757d;
+  width: 100px;
+  flex-shrink: 0;
+}
+
+.detailValue {
+  color: #212529;
+}
+
+.resolved {
+  color: #28a745;
+  font-weight: 600;
+}
+
+.unresolved {
+  color: #dc3545;
+  font-weight: 600;
+}
+
+.description {
+  margin-top: 24px;
+  padding: 16px;
+  border-top: 1px solid #e9ecef;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.description h3 {
+  font-size: 1.1rem;
+  margin-bottom: 12px;
+  color: #343a40;
+}
+
+.description p {
+  color: #495057;
+  line-height: 1.6;
+  white-space: pre-wrap;
+  margin-bottom: 0;
+}
+
+.messagesSection {
+  padding: 24px;
+  background-color: #f8f9fa;
+  border-top: 2px solid #dee2e6;
+  display: flex;
+  flex-direction: column;
+}
+
+.messagesSection h3 {
+  font-size: 1.1rem;
+  margin-bottom: 16px;
+  color: #343a40;
+}
+
+.messagesList {
+  margin-bottom: 24px;
+  padding-right: 8px;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.messageItem {
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  padding: 12px 16px;
+  margin-bottom: 12px;
+}
+
+.messageHeader {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  align-items: center;
+}
+
+.messageActions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.deleteMessageBtn {
+  padding: 2px 8px;
+  font-size: 0.75rem;
+}
+
+.messageAuthor {
+  font-weight: 600;
+  color: #495057;
+}
+
+.messageTime {
+  font-size: 0.8rem;
+  color: #6c757d;
+}
+
+.messageContent {
+  color: #212529;
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+
+.noMessages {
+  color: #6c757d;
+  font-style: italic;
+  text-align: center;
+  padding: 20px;
+}
+
+.addMessage {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.messageInput {
+  flex-grow: 1;
+  resize: none;
+}
+
+.messageActions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.fileInputContainer {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.fileInput {
+  width: 0.1px;
+  height: 0.1px;
+  opacity: 0;
+  overflow: hidden;
+  position: absolute;
+  z-index: -1;
+}
+
+.fileInputLabel {
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 12px;
+  font-size: 0.875rem;
+  color: #6c757d;
+  background-color: transparent;
+  border: 1px solid #6c757d;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.fileInputLabel:hover {
+  background-color: #f8f9fa;
+}
+
+.selectedFileName {
+  font-size: 0.875rem;
+  color: #495057;
+  max-width: 150px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sendButton {
+  align-self: flex-end;
+}
+
+.attachmentContainer {
+  margin-top: 8px;
+  padding: 8px;
+  background-color: #f1f3f5;
+  border-radius: 4px;
+}
+
+.attachmentLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: #0d6efd;
+  text-decoration: none;
+}
+
+.attachmentLink:hover {
+  text-decoration: underline;
+}
+
+/* Content Layout */
+.contentLayout {
+  display: flex;
+  flex-direction: column;
+  /* Removed overflow-y and max-height to prevent scrolling */
+}
+
+.ticketSection {
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.ticketDetailsContainer {
+  display: flex;
+  flex-direction: column;
+}
+
+.ticketDetailsGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  padding: 24px;
+  background-color: white;
+}
+
+.descriptionSection {
+  padding: 0 24px 24px;
+  background-color: white;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .ticketDetails {
+    grid-template-columns: 1fr;
+  }
+
+  .ticketDetailsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .detailRow {
+    flex-direction: column;
+    margin-bottom: 16px;
+  }
+  
+  .detailLabel {
+    width: 100%;
+    margin-bottom: 4px;
+  }
+  
+  .addMessage {
+    flex-direction: column;
+  }
+  
+  .sendButton {
+    align-self: flex-start;
+    width: 100%;
+  }
+}
+
+/* Edit Form Styles */
+.editForm {
+  padding: 20px;
+  background-color: white;
+}
+
+.formActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+}

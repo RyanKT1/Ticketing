@@ -8,6 +8,7 @@ import {
     GetItemCommand,
     PutItemCommandOutput,
     DeleteItemCommandOutput,
+    QueryCommand,
 } from '@aws-sdk/client-dynamodb';
 import { Injectable } from '@nestjs/common';
 import { Ticket } from './entities/ticket.entity';
@@ -42,6 +43,24 @@ export class TicketsRepository {
         return ticketsList;
     }
 
+    public async findAllTicketsByOwner(ticketOwner:string): Promise<Ticket[]> {
+        const ticketsList: Ticket[] = [];
+
+        const command = new QueryCommand({
+            TableName: this.tableName,
+            IndexName:'ticketOwner',
+            KeyConditionExpression:`ticketId = :${ticketOwner}`
+
+        });
+        const response = await this.dynamoDbClient.send(command);
+
+        if (response.Items) {
+            response.Items.map(ticket => {
+                ticketsList.push(Ticket.createTicketInstanceFromDynamoDbObject(ticket));
+            });
+        }
+        return ticketsList;
+    }
     public async upsertOneTicket(ticket: Ticket): Promise<PutItemCommandOutput> {
         // combination of both create and update method
         const ticketObject: Record<string, AttributeValue> = {
@@ -49,9 +68,24 @@ export class TicketsRepository {
                 S: ticket.id,
             },
         };
-        if (ticket.deviceName) {
-            ticketObject.deviceName = {
-                S: ticket.deviceName,
+        if (ticket.deviceId) {
+            ticketObject.deviceId = {
+                S: ticket.deviceId,
+            };
+        }
+         if (ticket.deviceManufacturer) {
+            ticketObject.deviceManufacturer = {
+                S: ticket.deviceManufacturer,
+            };
+        }
+         if (ticket.deviceModel) {
+            ticketObject.deviceModel = {
+                S: ticket.deviceModel,
+            };
+        }
+        if (ticket.description) {
+            ticketObject.description = {
+                S: ticket.description,
             };
         }
         if (ticket.ticketOwner) {
@@ -59,11 +93,13 @@ export class TicketsRepository {
                 S: ticket.ticketOwner,
             };
         }
-        if (ticket.ticketDescription) {
-            ticketObject.ticketDescription = {
-                S: ticket.ticketDescription,
+        
+        if (ticket.severity) {
+            ticketObject.severity = {
+                N: String(ticket.severity),
             };
         }
+        
         if (ticket.updatedAt) {
             ticketObject.updatedAt = {
                 S: String(ticket.updatedAt),
