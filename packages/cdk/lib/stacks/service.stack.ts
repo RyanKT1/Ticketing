@@ -10,8 +10,8 @@ import { LogGroup } from 'aws-cdk-lib/aws-logs';
 import { Bucket } from 'aws-cdk-lib/aws-s3';
 import { BucketDeployment, Source } from 'aws-cdk-lib/aws-s3-deployment';
 import { Construct } from 'constructs';
-import * as path from 'path'
-
+import * as fs from 'fs';
+import * as path from 'path';
 interface ServiceStackProps extends StackProps {
   apiGatewayLogGroup : LogGroup
   stageName: string
@@ -89,15 +89,9 @@ export class ServiceStack extends Stack {
     defaultRootObject:"index.html"
   })
 
-    new BucketDeployment(this,'BucketDeployment',{
-      sources:[Source.asset(path.join(__dirname, '../../../../packages/frontend/dist'))],
-      destinationBucket:hostBucket,
-      distribution:ticketingDistribution,
-      distributionPaths:['/*']
-    })
 
   
-  new LambdaRestApi(this,'TicketingApi',{
+  const ticketingAPI = new LambdaRestApi(this,'TicketingApi',{
     restApiName:'TicketingApi',
     handler:ticketingLambda,
     proxy:true,
@@ -111,13 +105,13 @@ export class ServiceStack extends Stack {
     defaultCorsPreflightOptions:{allowOrigins:[`https://${ticketingDistribution.domainName}`],allowMethods:['GET','POST','PATCH','PUT','DELETE'], allowHeaders: ['Authorization', 'Content-Type'],
     allowCredentials: true}
   })
+  const apiEndpoint = `https://${ticketingAPI.restApiId}.execute-api.${this.region}.amazonaws.com/${props.stageName}`;
   const userPool = new UserPool(this,'TicketingUserPool',{
     userPoolName:`${props.stageName}-TicketingUserPool`,
     selfSignUpEnabled:true,
     autoVerify:{email:true},
     standardAttributes:{
-      email:{required:true,mutable:true},
-      preferredUsername:{required:true,mutable:false}
+      email:{required:true,mutable:true}
     },
     passwordPolicy:{
       minLength:8,
@@ -130,13 +124,13 @@ export class ServiceStack extends Stack {
     removalPolicy:RemovalPolicy.DESTROY
   })
   
-  const userPoolDomain = new UserPoolDomain(this, 'TicketingUserPoolDomain', {
+  new UserPoolDomain(this, 'TicketingUserPoolDomain', {
     userPool,
     cognitoDomain: {
-      domainPrefix: `${props.stageName}-ticketing-app-user-pool-domain` // Must be unique across AWS
+      domainPrefix: `${props.stageName}-ticketing-app-user-pool-domain`
     }
   });
-  
+  const userPoolDomain = `https://${props.stageName}-ticketing-app-user-pool-domain.auth.${this.region}.amazoncognito.com`;
   const userPoolClient = new UserPoolClient(this,'TicketingPoolClient',{
     userPool,
     generateSecret:false,
@@ -165,9 +159,38 @@ export class ServiceStack extends Stack {
     precedence:1
   })
   
-  // Set environment variables for the Lambda function
   ticketingLambda.addEnvironment('COGNITO_USER_POOL_ID', userPool.userPoolId);
   ticketingLambda.addEnvironment('COGNITO_APP_CLIENT_ID', userPoolClient.userPoolClientId);
+  ticketingLambda.addEnvironment('CLOUDFRONT_DOMAIN',ticketingDistribution.domainName)
+  // need to create a config file that will be deployed alongside the 
+  // react application
+  const tempConfigDir = path.join(__dirname, '../../../../temp-config');
+  if (!fs.existsSync(tempConfigDir)) {
+    fs.mkdirSync(tempConfigDir, { recursive: true });
+  }
+  const configContent = {
+    apiEndpoint,
+    auth: {
+      region: this.region,
+      userPoolId: userPool.userPoolId,
+      userPoolClientId: userPoolClient.userPoolClientId,
+      userPoolDomain
+    }
+  };
+  fs.writeFileSync(
+    path.join(tempConfigDir, 'config.json'),
+    JSON.stringify(configContent, null, 2)
+  );
+  new BucketDeployment(this, 'BucketDeployment', {
+    sources: [
+      Source.asset(path.join(__dirname, '../../../../packages/frontend/dist')),
+      Source.asset(tempConfigDir)
+    ],
+    destinationBucket: hostBucket,
+    distribution: ticketingDistribution,
+    distributionPaths: ['/*']
+  });
+
   }
  
 }

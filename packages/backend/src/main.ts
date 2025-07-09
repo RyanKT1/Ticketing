@@ -12,7 +12,7 @@ async function bootstrap(): Promise<Handler> {
 
     await app.init();
     app.enableCors({
-        origin: true,
+        origin: process.env.CLOUDFRONT_DOMAIN || true,
         methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
         allowedHeaders: ['Authorization', 'Content-Type'],
         credentials: true,

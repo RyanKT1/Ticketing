@@ -1,14 +1,5 @@
 import { useAuth } from 'react-oidc-context';
-
-const BASE_URL = true ? 'https://wgwbl1gq7b.execute-api.eu-west-2.amazonaws.com/beta': 'http://localhost:3003'
-
-const getAuthHeaders = (auth) => {
-    return {
-        'Authorization': `Bearer ${auth.user?.access_token}`,
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-    };
-};
+import { getAuthHeaders, BASE_URL } from '../helpers/service.helpers';
 
 export const getTickets = async () => {
    const auth = useAuth();

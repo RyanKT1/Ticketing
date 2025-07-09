@@ -1,15 +1,6 @@
 import { useAuth } from 'react-oidc-context';
+import { getAuthHeaders,BASE_URL } from '../helpers/service.helpers';
 
-const BASE_URL = true ? 'https://wgwbl1gq7b.execute-api.eu-west-2.amazonaws.com/beta': 'http://localhost:3003'
-//const DEV_BASE_URL = 'http://localhost:3003'
-
-const getAuthHeaders = (auth) => {
-    return {
-        'Authorization': `Bearer ${auth.user?.access_token}`,
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-    };
-};
 
 export const getDevices = async () => {
   const auth = useAuth();
