@@ -6,9 +6,10 @@ import { S3BucketOrigin } from 'aws-cdk-lib/aws-cloudfront-origins';
 import { AccountRecovery, OAuthScope, UserPool, UserPoolClient, UserPoolClientIdentityProvider, UserPoolDomain, UserPoolGroup } from 'aws-cdk-lib/aws-cognito';
 import { AttributeType, Table } from 'aws-cdk-lib/aws-dynamodb';
 import { Code, Function, Runtime } from 'aws-cdk-lib/aws-lambda';
-import { LogGroup } from 'aws-cdk-lib/aws-logs';
+import { LogGroup, RetentionDays } from 'aws-cdk-lib/aws-logs';
 import { Bucket } from 'aws-cdk-lib/aws-s3';
 import { BucketDeployment, Source } from 'aws-cdk-lib/aws-s3-deployment';
+import { AwsCustomResource, AwsCustomResourcePolicy, PhysicalResourceId } from 'aws-cdk-lib/custom-resources';
 import { Construct } from 'constructs';
 import * as fs from 'fs';
 import * as path from 'path';
@@ -162,29 +163,39 @@ export class ServiceStack extends Stack {
   ticketingLambda.addEnvironment('COGNITO_USER_POOL_ID', userPool.userPoolId);
   ticketingLambda.addEnvironment('COGNITO_APP_CLIENT_ID', userPoolClient.userPoolClientId);
   ticketingLambda.addEnvironment('CLOUDFRONT_DOMAIN',ticketingDistribution.domainName)
+
   // need to create a config file that will be deployed alongside the 
   // react application
-  const tempConfigDir = path.join(__dirname, '../../../../temp-config');
-  if (!fs.existsSync(tempConfigDir)) {
-    fs.mkdirSync(tempConfigDir, { recursive: true });
-  }
-  const configContent = {
-    apiEndpoint,
-    auth: {
-      region: this.region,
-      userPoolId: userPool.userPoolId,
-      userPoolClientId: userPoolClient.userPoolClientId,
-      userPoolDomain
-    }
-  };
-  fs.writeFileSync(
-    path.join(tempConfigDir, 'config.json'),
-    JSON.stringify(configContent, null, 2)
-  );
+  new AwsCustomResource(this, 'ConfigUploader', {
+    onUpdate: {
+      service: 'S3',
+      action: 'putObject',
+      parameters: {
+        Bucket: hostBucket.bucketName,
+        Key: 'config.json',
+        Body: JSON.stringify({
+          apiEndpoint,
+          auth: {
+            region: this.region,
+            userPoolId: userPool.userPoolId,
+            userPoolClientId: userPoolClient.userPoolClientId,
+            userPoolDomain
+          }
+        }, null, 2),
+        ContentType: 'application/json',
+        CacheControl: 'no-cache'
+      },
+      physicalResourceId: PhysicalResourceId.of('config-' + Date.now().toString())
+    },
+    policy: AwsCustomResourcePolicy.fromSdkCalls({
+      resources: [hostBucket.arnForObjects('config.json')]
+    }),
+    logRetention: RetentionDays.ONE_DAY
+  });
+
   new BucketDeployment(this, 'BucketDeployment', {
     sources: [
-      Source.asset(path.join(__dirname, '../../../../packages/frontend/dist')),
-      Source.asset(tempConfigDir)
+      Source.asset(path.join(__dirname, '../../../../packages/frontend/dist'))
     ],
     destinationBucket: hostBucket,
     distribution: ticketingDistribution,
