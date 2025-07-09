@@ -1,7 +1,7 @@
 import { useAuth } from 'react-oidc-context';
 import { handleSignOutRedirect } from '../../helpers/auth.helpers';
 
-function CognitoAuthentication({ authenticatedContent }) {
+function CognitoAuthentication({ children }) {
   const auth = useAuth();
   const signOutRedirect = () => handleSignOutRedirect(auth);
 
@@ -54,7 +54,7 @@ function CognitoAuthentication({ authenticatedContent }) {
     );
   }
   
-  return authenticatedContent({ signOutRedirect });
+  return children({ signOutRedirect });
 }
 
 export default CognitoAuthentication;
