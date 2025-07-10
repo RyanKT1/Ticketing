@@ -6,7 +6,7 @@ async function bootstrap() {
     const app = await NestFactory.create(AppModule);
     const { httpAdapter } = app.get(HttpAdapterHost);
     app.useGlobalFilters(new ExceptionFilter(httpAdapter));
-     app.enableCors()
+     app.enableCors('*')
     
     await app.listen(process.env.PORT ?? 3003);
 }
