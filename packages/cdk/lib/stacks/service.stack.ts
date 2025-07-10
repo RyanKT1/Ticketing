@@ -4,17 +4,17 @@ import { AccessLogFormat, LambdaRestApi, LogGroupLogDestination } from 'aws-cdk-
 import { Distribution, ViewerProtocolPolicy } from 'aws-cdk-lib/aws-cloudfront';
 import { S3BucketOrigin } from 'aws-cdk-lib/aws-cloudfront-origins';
 import { AccountRecovery, OAuthScope, UserPool, UserPoolClient, UserPoolClientIdentityProvider, UserPoolDomain, UserPoolGroup } from 'aws-cdk-lib/aws-cognito';
-import { AttributeType, Table } from 'aws-cdk-lib/aws-dynamodb';
+import { AttributeType, StreamViewType, Table } from 'aws-cdk-lib/aws-dynamodb';
 import { Code, Function, Runtime } from 'aws-cdk-lib/aws-lambda';
 import { LogGroup, RetentionDays } from 'aws-cdk-lib/aws-logs';
 import { Bucket } from 'aws-cdk-lib/aws-s3';
 import { BucketDeployment, Source } from 'aws-cdk-lib/aws-s3-deployment';
 import { AwsCustomResource, AwsCustomResourcePolicy, PhysicalResourceId } from 'aws-cdk-lib/custom-resources';
 import { Construct } from 'constructs';
-import * as fs from 'fs';
 import * as path from 'path';
 interface ServiceStackProps extends StackProps {
   apiGatewayLogGroup : LogGroup
+  lambdaLogGroup: LogGroup
   stageName: string
 }
 
@@ -29,22 +29,26 @@ export class ServiceStack extends Stack {
   runtime: Runtime.NODEJS_18_X,
   handler: 'dist/lambda.handler', 
   code: Code.fromAsset(lambdaPath),
-  functionName:"TicketingLambda"
+  functionName:"TicketingLambda",
+  logGroup:props.lambdaLogGroup
     }); 
 
     const devicesTable = new Table(this,'devices',{
     tableName:'devices',
+    stream:StreamViewType.NEW_AND_OLD_IMAGES,
     partitionKey:{
         name:'id',
         type: AttributeType.STRING
-    }
+    }, contributorInsightsEnabled:true
   })
    const ticketsTable = new Table(this,'tickets',{
     tableName:'tickets',
+     stream:StreamViewType.NEW_AND_OLD_IMAGES,
     partitionKey:{
         name:'id',
         type: AttributeType.STRING
-    }
+    },
+    contributorInsightsEnabled:true
   })
   ticketsTable.addGlobalSecondaryIndex({
     indexName:'gsi',
@@ -52,10 +56,12 @@ export class ServiceStack extends Stack {
   })
   const messagesTable = new Table(this,'messages',{
     tableName:'messages',
+     stream:StreamViewType.NEW_AND_OLD_IMAGES,
     partitionKey:{
         name:'id',
         type: AttributeType.STRING
-    }
+    },
+    contributorInsightsEnabled:true
   })
   messagesTable.addGlobalSecondaryIndex({
     indexName:'gsi',

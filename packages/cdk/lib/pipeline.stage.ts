@@ -10,7 +10,7 @@ export class PipelineStage extends Stage{
         
         
         const monitoringStack = new MonitoringStack(this,`${stageName}-Monitoring-Stack`,{...props,stackName:`${stageName}-Monitoring-Stack`,stageName:stageName})
-        new ServiceStack(this,`${stageName}-Service-Stack`,{...props,stackName:`${stageName}-Service-Stack`,stageName:stageName, apiGatewayLogGroup:monitoringStack.apiGatewayLogGroup})
+        new ServiceStack(this,`${stageName}-Service-Stack`,{...props,stackName:`${stageName}-Service-Stack`,stageName:stageName, apiGatewayLogGroup:monitoringStack.apiGatewayLogGroup,lambdaLogGroup:monitoringStack.lambdaLogGroup})
        
 
     }

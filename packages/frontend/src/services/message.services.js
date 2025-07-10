@@ -1,4 +1,3 @@
-import { useAuth } from 'react-oidc-context';
 import { getAuthHeaders, BASE_URL } from '../helpers/service.helpers';
 
 export const createMessage = async (createMessageParams, file = null,auth) => {

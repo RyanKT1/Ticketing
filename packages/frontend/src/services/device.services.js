@@ -1,4 +1,3 @@
-import { useAuth } from 'react-oidc-context';
 import { getAuthHeaders,BASE_URL } from '../helpers/service.helpers';
 
 

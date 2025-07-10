@@ -1,4 +1,5 @@
 import { NavLink } from "react-router-dom";
+import { useAuth } from "react-oidc-context";
 import styles from './header.module.css';
 
 const Header = () => {
