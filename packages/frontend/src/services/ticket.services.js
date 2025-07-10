@@ -1,112 +1,134 @@
 import { getAuthHeaders, BASE_URL } from '../helpers/service.helpers';
+import { ApiError } from '../helpers/error.helpers';
 
 export const getTickets = async (auth) => {
-   
-
     try {
         const response = await fetch(`${BASE_URL}/tickets`, {
             method: 'GET',
             headers: getAuthHeaders(auth)
         });
         
-        if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-        }
         const data = await response.json();
-        return data;
+        
+        if (!response.ok) {
+            const errorCode = data.error?.code || `HTTP_${response.status}`;
+            const errorMessage = data.error?.message || `HTTP error! Status: ${response.status}`;
+            throw new ApiError(errorCode, errorMessage);
+        }
+        
+        return data.data;
     } catch (error) {
         console.error('Error fetching tickets:', error);
-        // error modal
-        return [];
+        if (error instanceof ApiError) {
+            throw error;
+        } else {
+            throw new ApiError('NETWORK_ERROR', error.message);
+        }
     }
 }
 
-export const createTicket = async (createTicketParams,auth) => {
-   
-
+export const createTicket = async (createTicketParams, auth) => {
     try {
-        const response = await fetch(`${BASE_URL}/tickets/create`, {
+        const response = await fetch(`${BASE_URL}/tickets`, {
             method: 'POST',
             headers: getAuthHeaders(auth),
             body: JSON.stringify(createTicketParams)
         });
         
+        const data = await response.json();
+        
         if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
+            const errorCode = data.error?.code || `HTTP_${response.status}`;
+            const errorMessage = data.error?.message || `HTTP error! Status: ${response.status}`;
+            throw new ApiError(errorCode, errorMessage);
         }
         
-        const data = await response.json();
-        return data.results;
+        return data.data;
     } catch (error) {
         console.error('Error creating ticket:', error);
-        // error modal
-        throw error;
+        if (error instanceof ApiError) {
+            throw error;
+        } else {
+            throw new ApiError('NETWORK_ERROR', error.message);
+        }
     }
 }
 
-export const deleteTicket = async (id,auth) => {
-   
-
+export const deleteTicket = async (id, auth) => {
     try {
-        const response = await fetch(`${BASE_URL}/tickets/id=${encodeURIComponent(id)}`, {
+        const response = await fetch(`${BASE_URL}/tickets/${encodeURIComponent(id)}`, {
             method: "DELETE",
             headers: getAuthHeaders(auth)
         });
         
+        const data = await response.json();
+        
         if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
+            const errorCode = data.error?.code || `HTTP_${response.status}`;
+            const errorMessage = data.error?.message || `HTTP error! Status: ${response.status}`;
+            throw new ApiError(errorCode, errorMessage);
         }
         
-        const data = await response.json();
-        return data.results;
+        return data.data;
     } catch (error) {
         console.error(`Error deleting ticket with id ${id}:`, error);
-        // error modal
-        throw error;
+        if (error instanceof ApiError) {
+            throw error;
+        } else {
+            throw new ApiError('NETWORK_ERROR', error.message);
+        }
     }
 }
 
-export const getTicket = async (id,auth) => {
-   
-
+export const getTicket = async (id, auth) => {
     try {
-        const response = await fetch(`${BASE_URL}/tickets/id=${encodeURIComponent(id)}`, {
+        const response = await fetch(`${BASE_URL}/tickets/${encodeURIComponent(id)}`, {
             method: "GET",
             headers: getAuthHeaders(auth)
         });
         
+        const data = await response.json();
+        
         if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
+            const errorCode = data.error?.code || `HTTP_${response.status}`;
+            const errorMessage = data.error?.message || `HTTP error! Status: ${response.status}`;
+            throw new ApiError(errorCode, errorMessage);
         }
         
-        const data = await response.json();
-        return data.results;
+        return data.data;
     } catch (error) {
         console.error(`Error fetching ticket with id ${id}:`, error);
-        // error modal
-        return null;
+        if (error instanceof ApiError) {
+            throw error;
+        } else {
+            throw new ApiError('NETWORK_ERROR', error.message);
+        }
     }
 }
 
-export const updateTicket = async (id, updateTicketParams,auth) => {
-   
-
+export const updateTicket = async (id, updateTicketParams, auth) => {
     try {
-        const response = await fetch(`${BASE_URL}/tickets/id=${encodeURIComponent(id)}`, {
+        const response = await fetch(`${BASE_URL}/tickets/${encodeURIComponent(id)}`, {
             method: "PATCH",
             headers: getAuthHeaders(auth),
             body: JSON.stringify(updateTicketParams)
         });
         
+        const data = await response.json();
+        
         if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
+            const errorCode = data.error?.code || `HTTP_${response.status}`;
+            const errorMessage = data.error?.message || `HTTP error! Status: ${response.status}`;
+            throw new ApiError(errorCode, errorMessage);
         }
         
-        const data = await response.json();
-        return data.results;
+        return data.data;
     } catch (error) {
         console.error(`Error updating ticket with id ${id}:`, error);
-        // error modal
-        throw error;
+        if (error instanceof ApiError) {
+            throw error;
+        } else {
+            throw new ApiError('NETWORK_ERROR', error.message);
+        }
     }
 }

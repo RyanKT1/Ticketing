@@ -1,8 +1,9 @@
 import { useState } from "react";
 import DeviceForm from "../components/device-form/device-form.component";
 import { createDevice } from "../services/device.services";
-import { Alert } from "react-bootstrap";
 import { useAuth } from "react-oidc-context";
+import SuccessModal from "../components/modal/success-modal.component";
+import ErrorModal from "../components/modal/error-modal.component";
 
 function CreateDevicePage() {
     const baseFormData = {
@@ -15,6 +16,7 @@ function CreateDevicePage() {
     const [errors, setErrors] = useState({});
     const [showSuccessModal, setShowSuccessModal] = useState(false);
     const [showErrorModal, setShowErrorModal] = useState(false);
+    const [modalTitle, setModalTitle] = useState('');
     const [modalMessage, setModalMessage] = useState('');
 
     const validateForm = () => {
@@ -40,19 +42,22 @@ function CreateDevicePage() {
         event.preventDefault();
 
         if (!validateForm()) {
+            setModalTitle('Validation Error');
             setModalMessage('Please fix the errors in the form before submitting.');
             setShowErrorModal(true);
             return;
         }
         
         try {
-            await createDevice(formData,auth);
+            await createDevice(formData, auth);
             setFormData(baseFormData);
+            setModalTitle('Success');
             setModalMessage('Device created successfully!');
             setShowSuccessModal(true);
         } catch (error) {
             console.log(error);
-            setModalMessage('Failed to create device. Please try again.');
+            setModalTitle(error.name || 'Error');
+            setModalMessage(error.message || 'Failed to create device. Please try again.');
             setShowErrorModal(true);
         }
     };
@@ -65,27 +70,39 @@ function CreateDevicePage() {
         });
     };
 
+    const closeSuccessModal = () => {
+        setShowSuccessModal(false);
+    };
+
+    const closeErrorModal = () => {
+        setShowErrorModal(false);
+    };
+
     return (
         <div className="container mt-4">
             <h2>Create New Device</h2>
-            
-            {showSuccessModal && (
-                <Alert variant="success" className="mb-3" dismissible onClose={() => setShowSuccessModal(false)}>
-                    {modalMessage}
-                </Alert>
-            )}
-            
-            {showErrorModal && (
-                <Alert variant="danger" className="mb-3" dismissible onClose={() => setShowErrorModal(false)}>
-                    {modalMessage}
-                </Alert>
-            )}
             
             <DeviceForm 
                 formData={formData}
                 errors={errors}
                 handleSubmit={handleSubmit}
                 handleInputChange={handleInputChange}
+            />
+            
+            <SuccessModal
+                title={modalTitle}
+                message={modalMessage}
+                show={showSuccessModal}
+                onClose={closeSuccessModal}
+                navigateTo="/device/table"
+            />
+            
+            <ErrorModal
+                title={modalTitle}
+                message={modalMessage}
+                show={showErrorModal}
+                onClose={closeErrorModal}
+                navigateTo="/device/table"
             />
         </div>
     );

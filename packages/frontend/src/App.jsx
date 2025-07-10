@@ -29,6 +29,7 @@ function App() {
                 </Route>
                 <Route path='ticket'>
                   <Route path="create" element={<CreateTicketPage />} />
+                  <Route path="create/:deviceId" element={<CreateTicketPage />} />
                   <Route path="info/:id" element={<TicketPage />} />
                   <Route path="management" element={<TicketManagementPage />} />
                 </Route>

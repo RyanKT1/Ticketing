@@ -12,10 +12,12 @@ async function bootstrap(): Promise<Handler> {
 
     await app.init();
     app.enableCors({
-        origin: process.env.CLOUDFRONT_DOMAIN || true,
-        methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-        allowedHeaders: ['Authorization', 'Content-Type'],
+        origin: process.env.CLOUDFRONT_DOMAIN || '*', 
+        methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+        allowedHeaders: ['Authorization', 'Content-Type', 'Origin', 'Accept'],
+        exposedHeaders: ['Access-Control-Allow-Origin'],
         credentials: true,
+        maxAge: 86400
     });
     const expressApp = app.getHttpAdapter().getInstance();
     return serverlessExpress({ app: expressApp });

@@ -1,7 +1,7 @@
 import { getAuthHeaders, BASE_URL } from '../helpers/service.helpers';
+import { ApiError } from '../helpers/error.helpers';
 
-export const createMessage = async (createMessageParams, file = null,auth) => {
-    
+export const createMessage = async (createMessageParams, file = null, auth) => {
     try {
         let response;
         
@@ -27,57 +27,73 @@ export const createMessage = async (createMessageParams, file = null,auth) => {
             });
         }
         
+        const data = await response.json();
+        
         if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
+            const errorCode = data.error?.code || `HTTP_${response.status}`;
+            const errorMessage = data.error?.message || `HTTP error! Status: ${response.status}`;
+            throw new ApiError(errorCode, errorMessage);
         }
         
-        const data = await response.json();
-        return data;
+        return data.data;
     } catch (error) {
         console.error('Error creating message:', error);
-        // error modal
-        throw error;
+        if (error instanceof ApiError) {
+            throw error;
+        } else {
+            throw new ApiError('NETWORK_ERROR', error.message);
+        }
     }
 }
 
-export const deleteMessage = async (id,auth) => {
-    
+export const deleteMessage = async (id, auth) => {
     try {
-        const response = await fetch(`${BASE_URL}/messages/id=${encodeURIComponent(id)}`, {
+        const response = await fetch(`${BASE_URL}/messages/${encodeURIComponent(id)}`, {
             method: "DELETE",
             headers: getAuthHeaders(auth)
         });
         
+        const data = await response.json();
+        
         if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
+            const errorCode = data.error?.code || `HTTP_${response.status}`;
+            const errorMessage = data.error?.message || `HTTP error! Status: ${response.status}`;
+            throw new ApiError(errorCode, errorMessage);
         }
         
-        const data = await response.json();
-        return data.results;
+        return data.data;
     } catch (error) {
         console.error(`Error deleting message with id ${id}:`, error);
-        // error modal
-        throw error;
+        if (error instanceof ApiError) {
+            throw error;
+        } else {
+            throw new ApiError('NETWORK_ERROR', error.message);
+        }
     }
 }
 
-export const getMessages = async (tickedId,auth) => {
-    
+export const getMessages = async (ticketId, auth) => {
     try {
-        const response = await fetch(`${BASE_URL}/messages/ticketId=${encodeURIComponent(tickedId)}`, {
+        const response = await fetch(`${BASE_URL}/messages/${encodeURIComponent(ticketId)}`, {
             method: "GET",
             headers: getAuthHeaders(auth)
         });
         
+        const data = await response.json();
+        
         if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
+            const errorCode = data.error?.code || `HTTP_${response.status}`;
+            const errorMessage = data.error?.message || `HTTP error! Status: ${response.status}`;
+            throw new ApiError(errorCode, errorMessage);
         }
         
-        const data = await response.json();
-        return data.results;
+        return data.data;
     } catch (error) {
-        console.error(`Error fetching messages with ticketId ${tickedId}:`, error);
-        // error modal
-        return null;
+        console.error(`Error fetching messages with ticketId ${ticketId}:`, error);
+        if (error instanceof ApiError) {
+            throw error;
+        } else {
+            throw new ApiError('NETWORK_ERROR', error.message);
+        }
     }
 }

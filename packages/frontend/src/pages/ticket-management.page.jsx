@@ -3,16 +3,24 @@ import { Container, Row, Col, Pagination, Alert, ButtonGroup, Button } from "rea
 import { useAuth } from "react-oidc-context";
 import { deleteTicket, getTickets, updateTicket } from "../services/ticket.services";
 import TicketCard from "../components/ticket-card/ticket-card.component";
+import SuccessModal from "../components/modal/success-modal.component";
+import ErrorModal from "../components/modal/error-modal.component";
+import ConfirmationModal from "../components/modal/confirmation-modal.component";
 
 function TicketManagementPage() {
-
     const auth = useAuth();
     const [tickets, setTickets] = useState([]);
-    const [error, setError] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(1);
     const [filter, setFilter] = useState('all');
     const ticketsPerPage = 5;
+    
+    const [showSuccessModal, setShowSuccessModal] = useState(false);
+    const [showErrorModal, setShowErrorModal] = useState(false);
+    const [showConfirmationModal, setShowConfirmationModal] = useState(false);
+    const [modalTitle, setModalTitle] = useState('');
+    const [modalMessage, setModalMessage] = useState('');
+    const [ticketToDelete, setTicketToDelete] = useState(null);
 
     const exampleTicket = [{
         id: "12312312",
@@ -21,22 +29,21 @@ function TicketManagementPage() {
         deviceId: "21321321321",
         ticketOwner: "Ryan",
         resolved: false,
-        severity:5,
+        severity: 5,
         createdAt: new Date(),
         updatedAt: new Date()
     },{
         id: "1231231234",
         title: 'ryan ticket title2',
         ticketDescription: "Hello this is my ticket 1234",
-        deviceModel:"s22",
-        deviceManufacturer:"Samsung",
+        deviceModel: "s22",
+        deviceManufacturer: "Samsung",
         ticketOwner: "Ryan",
         resolved: false,
-        severity:3,
+        severity: 3,
         createdAt: new Date(),
         updatedAt: new Date()
-    }
-]
+    }]
 
     useEffect(() => {
         const fetchTickets = async () => {
@@ -45,50 +52,73 @@ function TicketManagementPage() {
                 
                 const safeTicketList = ticketList || [];
                 
-                const updatedTickets = [...safeTicketList, ... exampleTicket];
+                const updatedTickets = [...safeTicketList, ...exampleTicket];
                 
                 setTickets(updatedTickets);
                 setTotalPages(Math.ceil(updatedTickets.length / ticketsPerPage));
-                setError(null);
             } catch (error) {
                 console.error("Error fetching tickets:", error);
+                setModalTitle(error.name || 'Error');
+                setModalMessage(error.message || 'Failed to load tickets. Please try again later.');
+                setShowErrorModal(true);
                 setTickets(exampleTicket); 
                 setTotalPages(1);
-                setError("Failed to load tickets. Please try again later.");
             }
         };
 
         fetchTickets();
-    }, []); 
+    }, [auth]); 
 
     const handleResolveTicket = async (ticketId, markAsResolved = true) => {
-        console.log("call resolve")
-       try{
-            await updateTicket(ticketId,{resolved:markAsResolved},auth)
+        try {
+            await updateTicket(ticketId, { resolved: markAsResolved }, auth);
             setTickets(prevTickets => 
-            prevTickets.map(ticket => 
-                ticket.id === ticketId 
-                    ? { ...ticket, resolved: markAsResolved } 
-                    : ticket
-            )
-        );
-       }  catch (error) {
+                prevTickets.map(ticket => 
+                    ticket.id === ticketId 
+                        ? { ...ticket, resolved: markAsResolved } 
+                        : ticket
+                )
+            );
+            setModalTitle('Success');
+            setModalMessage(`Ticket ${markAsResolved ? 'resolved' : 'reopened'} successfully!`);
+            setShowSuccessModal(true);
+        } catch (error) {
             console.error("Error updating ticket:", error);
-            // Error modal
+            setModalTitle(error.name || 'Error');
+            setModalMessage(error.message || `Failed to ${markAsResolved ? 'resolve' : 'reopen'} ticket. Please try again.`);
+            setShowErrorModal(true);
         }
-        
     };
 
-    const handleDeleteTicket = async (ticketId) => {
-       try{
-        await deleteTicket(ticketId,auth)
-         setTickets(prevTickets => 
-            prevTickets.filter(ticket => ticket.id !== ticketId)
-        );
+    const confirmDeleteTicket = (ticketId) => {
+        const ticket = tickets.find(t => t.id === ticketId);
+        if (!ticket) return;
         
-       }catch(error){
-         console.error("Error deleting ticket:", error);
-       }
+        setTicketToDelete(ticketId);
+        setModalTitle('Confirm Deletion');
+        setModalMessage(`Are you sure you want to delete the ticket "${ticket.title}"? This action cannot be undone.`);
+        setShowConfirmationModal(true);
+    };
+
+    const handleDeleteTicket = async () => {
+        if (!ticketToDelete) return;
+        
+        try {
+            await deleteTicket(ticketToDelete, auth);
+            setTickets(prevTickets => 
+                prevTickets.filter(ticket => ticket.id !== ticketToDelete)
+            );
+            setModalTitle('Success');
+            setModalMessage('Ticket deleted successfully!');
+            setShowSuccessModal(true);
+        } catch (error) {
+            console.error("Error deleting ticket:", error);
+            setModalTitle(error.name || 'Error');
+            setModalMessage(error.message || 'Failed to delete ticket. Please try again.');
+            setShowErrorModal(true);
+        }
+        
+        setTicketToDelete(null);
     };
     
     const getFilteredTickets = () => {
@@ -145,12 +175,23 @@ function TicketManagementPage() {
         
         return items;
     };
+    
+    const closeSuccessModal = () => {
+        setShowSuccessModal(false);
+    };
+    
+    const closeErrorModal = () => {
+        setShowErrorModal(false);
+    };
+    
+    const closeConfirmationModal = () => {
+        setShowConfirmationModal(false);
+        setTicketToDelete(null);
+    };
 
     return (
         <Container className="py-4">
             <h1 className="mb-4">Ticket Management</h1>
-            
-            {error && <Alert variant="danger">{error}</Alert>}
             
             <div className="d-flex justify-content-between align-items-center mb-4">
                 <ButtonGroup>
@@ -179,28 +220,51 @@ function TicketManagementPage() {
                 <Alert variant="info">No tickets found.</Alert>
             ) : (
                 <>
-                            <Row>
-                                {getCurrentTickets().map(ticket => (
-                                    <Col key={ticket.id} xs={12} lg={6} className="mb-4">
-                                        <TicketCard 
-                                            ticket={ticket} 
-                                            onResolve={handleResolveTicket}
-                                            onDelete={handleDeleteTicket}
-                                        />
-                                    </Col>
-                                ))}
-                            </Row>
-                            
-                            {totalPages > 1 && (
-                                <div className="d-flex justify-content-center mt-4">
-                                    <Pagination>{renderPaginationItems()}</Pagination>
-                                </div>
-                            )}
-                        </>
+                    <Row>
+                        {getCurrentTickets().map(ticket => (
+                            <Col key={ticket.id} xs={12} lg={6} className="mb-4">
+                                <TicketCard 
+                                    ticket={ticket} 
+                                    onResolve={handleResolveTicket}
+                                    onDelete={confirmDeleteTicket}
+                                />
+                            </Col>
+                        ))}
+                    </Row>
+                    
+                    {totalPages > 1 && (
+                        <div className="d-flex justify-content-center mt-4">
+                            <Pagination>{renderPaginationItems()}</Pagination>
+                        </div>
                     )}
-                
+                </>
+            )}
             
+            <SuccessModal
+                title={modalTitle}
+                message={modalMessage}
+                show={showSuccessModal}
+                onClose={closeSuccessModal}
+                navigateTo="/ticket/management"
+            />
+            
+            <ErrorModal
+                title={modalTitle}
+                message={modalMessage}
+                show={showErrorModal}
+                onClose={closeErrorModal}
+                navigateTo="/ticket/management"
+            />
+            
+            <ConfirmationModal
+                title={modalTitle}
+                message={modalMessage}
+                show={showConfirmationModal}
+                onClose={closeConfirmationModal}
+                onConfirm={handleDeleteTicket}
+            />
         </Container>
     );
 }
+
 export default TicketManagementPage;

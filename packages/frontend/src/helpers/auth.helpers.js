@@ -1,4 +1,4 @@
-import { getCognitoDomain } from '../config/auth-config';
+import { getCognitoDomain, getCloudfrontDomain } from '../config/auth-config';
 
 
 export const handleSigninCallback = () => {
