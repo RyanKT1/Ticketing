@@ -11,7 +11,8 @@ export const handleSigninCallback = () => {
 
 export const handleSignOutRedirect = (auth) => {
   const clientId = auth.settings.client_id;
-  const logoutUri = window.location.origin;
+  const logoutUri = getCloudfrontDomain()
   const cognitoDomain = getCognitoDomain();
   window.location.href = `${cognitoDomain}/logout?client_id=${clientId}&logout_uri=${encodeURIComponent(logoutUri)}`;
+  console.log(window.location.href)
 };

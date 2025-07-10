@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { useAuth } from "react-oidc-context";
 import TicketInfo from "../components/ticket-info/ticket-info.component";
 import TicketForm from "../components/ticket-form/ticket-form.component";
 import { createMessage, deleteMessage, getMessages } from "../services/message.services";
 import { getTicket, updateTicket } from "../services/ticket.services";
 
 function TicketPage(){
-    const navigate = useNavigate
+    const auth = useAuth();
+    const navigate = useNavigate()
     const { id } = useParams(); // Get the ticket ID from the URL
     const [messages, setMessages] = useState([]);
     const [error, setError] = useState({});

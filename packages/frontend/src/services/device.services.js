@@ -2,8 +2,8 @@ import { useAuth } from 'react-oidc-context';
 import { getAuthHeaders,BASE_URL } from '../helpers/service.helpers';
 
 
-export const getDevices = async () => {
-  const auth = useAuth();
+export const getDevices = async (auth) => {
+  
 
     try {
         const response = await fetch(`${BASE_URL}/devices`, {
@@ -24,8 +24,8 @@ export const getDevices = async () => {
     }
 }
 
-export const createDevice = async (createDeviceParams) => {
-  const auth = useAuth();
+export const createDevice = async (createDeviceParams,auth) => {
+  
     try {
         const response = await fetch(`${BASE_URL}/devices/create`, {
             method: 'POST',
@@ -46,8 +46,8 @@ export const createDevice = async (createDeviceParams) => {
     }
 }
 
-export const deleteDevice = async (id) => {
-  const auth = useAuth();
+export const deleteDevice = async (id,auth) => {
+  
     try {
         const response = await fetch(`${BASE_URL}/devices/id=${encodeURIComponent(id)}`, {
             method: "DELETE",
@@ -67,8 +67,8 @@ export const deleteDevice = async (id) => {
     }
 }
 
-export const getDevice = async (id) => {
-  const auth = useAuth();
+export const getDevice = async (id,auth) => {
+  
     try {
         const response = await fetch(`${BASE_URL}/devices/id=${encodeURIComponent(id)}`, {
             method: "GET",
@@ -88,8 +88,8 @@ export const getDevice = async (id) => {
     }
 }
 
-export const updateDevice = async (id, updateDeviceParams) => {
-  const auth = useAuth();
+export const updateDevice = async (id, updateDeviceParams,auth) => {
+  
     try {
         const response = await fetch(`${BASE_URL}/devices/id=${encodeURIComponent(id)}`, {
             method: "PATCH",

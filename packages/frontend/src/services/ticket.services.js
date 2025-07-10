@@ -1,8 +1,8 @@
 import { useAuth } from 'react-oidc-context';
 import { getAuthHeaders, BASE_URL } from '../helpers/service.helpers';
 
-export const getTickets = async () => {
-   const auth = useAuth();
+export const getTickets = async (auth) => {
+   
 
     try {
         const response = await fetch(`${BASE_URL}/tickets`, {
@@ -22,8 +22,8 @@ export const getTickets = async () => {
     }
 }
 
-export const createTicket = async (createTicketParams) => {
-   const auth = useAuth();
+export const createTicket = async (createTicketParams,auth) => {
+   
 
     try {
         const response = await fetch(`${BASE_URL}/tickets/create`, {
@@ -45,8 +45,8 @@ export const createTicket = async (createTicketParams) => {
     }
 }
 
-export const deleteTicket = async (id) => {
-   const auth = useAuth();
+export const deleteTicket = async (id,auth) => {
+   
 
     try {
         const response = await fetch(`${BASE_URL}/tickets/id=${encodeURIComponent(id)}`, {
@@ -67,8 +67,8 @@ export const deleteTicket = async (id) => {
     }
 }
 
-export const getTicket = async (id) => {
-   const auth = useAuth();
+export const getTicket = async (id,auth) => {
+   
 
     try {
         const response = await fetch(`${BASE_URL}/tickets/id=${encodeURIComponent(id)}`, {
@@ -89,8 +89,8 @@ export const getTicket = async (id) => {
     }
 }
 
-export const updateTicket = async (id, updateTicketParams) => {
-   const auth = useAuth();
+export const updateTicket = async (id, updateTicketParams,auth) => {
+   
 
     try {
         const response = await fetch(`${BASE_URL}/tickets/id=${encodeURIComponent(id)}`, {

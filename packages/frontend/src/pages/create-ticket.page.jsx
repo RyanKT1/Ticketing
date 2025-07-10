@@ -2,6 +2,7 @@ import { useState } from "react";
 import TicketForm from "../components/ticket-form/ticket-form.component";
 import { createTicket } from "../services/ticket.services";
 import { Alert } from "react-bootstrap";
+import { useAuth } from "react-oidc-context";
 
 function CreateTicketPage() {
     const baseFormData = {
@@ -12,7 +13,7 @@ function CreateTicketPage() {
         deviceModel: '',
         severity: ''
     };
-    
+    const auth = useAuth();
     const [formData, setFormData] = useState(baseFormData);
     const [errors, setErrors] = useState({});
     const [showSuccessModal, setShowSuccessModal] = useState(false);
@@ -60,7 +61,7 @@ function CreateTicketPage() {
         }
         
         try {
-            await createTicket(formData);
+            await createTicket(formData,auth);
             setFormData(baseFormData);
             setModalMessage('Ticket created successfully!');
             setShowSuccessModal(true);

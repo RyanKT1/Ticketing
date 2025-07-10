@@ -22,3 +22,7 @@ export const getCognitoDomain = () => {
   const config = window.appConfig
   return config.auth.userPoolDomain;
 };
+export const getCloudfrontDomain = () => {
+  const config = window.appConfig
+  return config.auth.cloudFrontUrl;
+};

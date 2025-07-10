@@ -1,9 +1,11 @@
 import { useState, useEffect } from "react";
 import { getDevices, deleteDevice, updateDevice } from "../services/device.services";
 import DevicesTable from "../components/device-table/devices-table.component";
+import { useAuth } from "react-oidc-context";
 
 function DeviceTablePage() {
-    
+
+    const auth = useAuth();
     const [devices, setDevices] = useState([]);
     const [editDeviceRow, setEditDeviceRow] = useState(null);
     const [editFormData, setEditFormData] = useState({});
@@ -11,7 +13,7 @@ function DeviceTablePage() {
     useEffect(() => {
         const fetchDevices = async () => {
             try {
-                const deviceList = await getDevices();
+                const deviceList = await getDevices(auth);
                 console.log(deviceList)
                 const fetchedDevices = deviceList || [];
                 const updatedDevices = [
@@ -50,7 +52,7 @@ function DeviceTablePage() {
     
     const handleDeleteDevice = async (device) => {
         try {
-            await deleteDevice(device.id);
+            await deleteDevice(device.id,auth);
             setDevices(devices.filter(d => d.id !== device.id));
             // success modal 
         } catch (error) {
@@ -83,7 +85,7 @@ function DeviceTablePage() {
     const handleEditFormSubmit = async (event) => {
         event.preventDefault();
         try {
-            await updateDevice(editDeviceRow, editFormData);
+            await updateDevice(editDeviceRow, editFormData,auth);
             const updatedDevices = devices.map(device => 
                 device.id === editDeviceRow ? { ...device, ...editFormData } : device
             );

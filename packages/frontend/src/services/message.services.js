@@ -1,8 +1,8 @@
 import { useAuth } from 'react-oidc-context';
 import { getAuthHeaders, BASE_URL } from '../helpers/service.helpers';
 
-export const createMessage = async (createMessageParams, file = null) => {
-    const auth = useAuth();
+export const createMessage = async (createMessageParams, file = null,auth) => {
+    
     try {
         let response;
         
@@ -41,8 +41,8 @@ export const createMessage = async (createMessageParams, file = null) => {
     }
 }
 
-export const deleteMessage = async (id) => {
-    const auth = useAuth();
+export const deleteMessage = async (id,auth) => {
+    
     try {
         const response = await fetch(`${BASE_URL}/messages/id=${encodeURIComponent(id)}`, {
             method: "DELETE",
@@ -62,8 +62,8 @@ export const deleteMessage = async (id) => {
     }
 }
 
-export const getMessages = async (tickedId) => {
-    const auth = useAuth();
+export const getMessages = async (tickedId,auth) => {
+    
     try {
         const response = await fetch(`${BASE_URL}/messages/ticketId=${encodeURIComponent(tickedId)}`, {
             method: "GET",

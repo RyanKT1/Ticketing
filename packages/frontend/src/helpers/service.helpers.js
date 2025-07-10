@@ -2,6 +2,7 @@
 // Beta default values
 window.appConfig = window.appConfig || {
   apiEndpoint: 'https://wgwbl1gq7b.execute-api.eu-west-2.amazonaws.com/beta',
+  cloudFrontUrl: 'https://d33i8dmm7nziay.cloudfront.net/',
   auth: {
     region: 'eu-west-2',
     userPoolId: 'eu-west-2_mCkMgiuT8',

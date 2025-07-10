@@ -2,6 +2,7 @@ import { useState } from "react";
 import DeviceForm from "../components/device-form/device-form.component";
 import { createDevice } from "../services/device.services";
 import { Alert } from "react-bootstrap";
+import { useAuth } from "react-oidc-context";
 
 function CreateDevicePage() {
     const baseFormData = {
@@ -9,7 +10,7 @@ function CreateDevicePage() {
         model: '',
         manufacturer: '',
     };
-    
+    const auth = useAuth();
     const [formData, setFormData] = useState(baseFormData);
     const [errors, setErrors] = useState({});
     const [showSuccessModal, setShowSuccessModal] = useState(false);
@@ -45,7 +46,7 @@ function CreateDevicePage() {
         }
         
         try {
-            await createDevice(formData);
+            await createDevice(formData,auth);
             setFormData(baseFormData);
             setModalMessage('Device created successfully!');
             setShowSuccessModal(true);

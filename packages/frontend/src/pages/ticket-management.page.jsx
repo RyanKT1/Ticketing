@@ -1,9 +1,12 @@
 import { useEffect, useState } from "react";
 import { Container, Row, Col, Pagination, Alert, ButtonGroup, Button } from "react-bootstrap";
+import { useAuth } from "react-oidc-context";
 import { deleteTicket, getTickets, updateTicket } from "../services/ticket.services";
 import TicketCard from "../components/ticket-card/ticket-card.component";
 
 function TicketManagementPage() {
+
+    const auth = useAuth();
     const [tickets, setTickets] = useState([]);
     const [error, setError] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
@@ -38,7 +41,7 @@ function TicketManagementPage() {
     useEffect(() => {
         const fetchTickets = async () => {
             try {
-                const ticketList = await getTickets();
+                const ticketList = await getTickets(auth);
                 
                 const safeTicketList = ticketList || [];
                 
@@ -61,7 +64,7 @@ function TicketManagementPage() {
     const handleResolveTicket = async (ticketId, markAsResolved = true) => {
         console.log("call resolve")
        try{
-            await updateTicket(ticketId,{resolved:markAsResolved})
+            await updateTicket(ticketId,{resolved:markAsResolved},auth)
             setTickets(prevTickets => 
             prevTickets.map(ticket => 
                 ticket.id === ticketId 
@@ -78,7 +81,7 @@ function TicketManagementPage() {
 
     const handleDeleteTicket = async (ticketId) => {
        try{
-        await deleteTicket(ticketId)
+        await deleteTicket(ticketId,auth)
          setTickets(prevTickets => 
             prevTickets.filter(ticket => ticket.id !== ticketId)
         );
