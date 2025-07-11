@@ -5,8 +5,6 @@ function CognitoAuthentication({ children }) {
   const auth = useAuth();
   const signOutRedirect = () => handleSignOutRedirect(auth);
 
-  console.log(auth)
-
   if (auth.isLoading) {
     return (
       <div className="d-flex justify-content-center align-items-center vh-100">
@@ -18,7 +16,7 @@ function CognitoAuthentication({ children }) {
   }
 
   if (auth.error) {
-    console.error("Authentication error:", auth.error);
+    console.error('Authentication error:', auth.error);
     return (
       <div className="alert alert-danger m-3">
         <h4>Authentication Error</h4>
@@ -28,7 +26,7 @@ function CognitoAuthentication({ children }) {
   }
 
   if (!auth.isAuthenticated) {
-    if (auth.activeNavigator === "signinRedirect") {
+    if (auth.activeNavigator === 'signinRedirect') {
       return (
         <div className="d-flex justify-content-center align-items-center vh-100">
           <div className="spinner-border" role="status">
@@ -37,14 +35,14 @@ function CognitoAuthentication({ children }) {
         </div>
       );
     }
-    
+
     return (
       <div className="d-flex flex-column justify-content-center align-items-center vh-100">
         <h1 className="mb-4">Device Ticketing</h1>
-        <button 
-          className="btn btn-primary btn-lg" 
+        <button
+          className="btn btn-primary btn-lg"
           onClick={() => {
-            console.log("Initiating sign-in redirect");
+            console.log('Initiating sign-in redirect');
             auth.signinRedirect();
           }}
         >
@@ -53,7 +51,7 @@ function CognitoAuthentication({ children }) {
       </div>
     );
   }
-  
+
   return children({ signOutRedirect });
 }
 

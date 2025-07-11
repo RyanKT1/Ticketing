@@ -1,28 +1,18 @@
-
 export const authConfig = () => {
-  const config = window.appConfig 
-  
+  const config = window.appConfig;
+
   return {
     authority: `https://cognito-idp.${config.auth.region}.amazonaws.com/${config.auth.userPoolId}`,
     client_id: config.auth.userPoolClientId,
-    redirect_uri: window.location.origin,
-    response_type: "code",
-    scope: "email openid profile",
+    redirect_uri: window.appConfig.cloudFrontUrl,
+    response_type: 'code',
+    scope: 'email openid profile',
     automaticSilentRenew: true,
     loadUserInfo: true,
     post_logout_redirect_uri: window.location.origin,
     monitorSession: true,
     extraQueryParams: {
-      prompt: 'login'
-    }
+      prompt: 'login',
+    },
   };
-};
-
-export const getCognitoDomain = () => {
-  const config = window.appConfig
-  return config.auth.userPoolDomain;
-};
-export const getCloudfrontDomain = () => {
-  const config = window.appConfig
-  return config.auth.cloudFrontUrl;
 };

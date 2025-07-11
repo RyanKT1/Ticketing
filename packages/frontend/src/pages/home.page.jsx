@@ -1,22 +1,15 @@
-import TicketCard from "../components/ticket-card/ticket-card.component"
-import TicketInfo from "../components/ticket-info/ticket-info.component"
+import { Container, Row, Col } from 'react-bootstrap';
 
-function HomePage(){
-    const ticket = {
-        title:'ticket title',
-        ticketDescription:"Hello this is my ticket 123",
-        deviceId:"21321321321",
-        ticketOwner:"Ryan",
-        resolved:false,
-        createdAt: new Date(),
-        updatedAt: new Date()
-        
-    }
-    return (
-        <>
-        <TicketCard ticket={ticket}></TicketCard>
-        <TicketInfo ticket={ticket}></TicketInfo>
-        </>
-    )
+function HomePage() {
+  return (
+    <Container className="py-5 text-center">
+      <Row className="justify-content-center">
+        <Col>
+          <h1 className="display-4 fw-bold">Welcome to Ticketing</h1>
+        </Col>
+      </Row>
+    </Container>
+  );
 }
-export default HomePage
+
+export default HomePage;

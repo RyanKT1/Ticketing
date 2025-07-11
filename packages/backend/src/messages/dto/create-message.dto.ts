@@ -1,16 +1,13 @@
-import {IsNotEmpty, IsString, IsUUID } from "class-validator";
+import { IsOptional, IsString, IsUUID } from 'class-validator';
 
 export class CreateMessageDto {
-    @IsUUID()
-    @IsNotEmpty()
-    ticketId:string
+  @IsUUID()
+  ticketId: string;
 
-    @IsString()
-    content:string
+  @IsString()
+  content: string;
 
-    @IsString()
-    fileName: string;
-
-    @IsString()
-    sentBy: string;
+  @IsOptional()
+  @IsString()
+  sentBy: string;
 }

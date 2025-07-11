@@ -1,18 +1,12 @@
-import { getCognitoDomain, getCloudfrontDomain } from '../config/auth-config';
-
-
-export const handleSigninCallback = () => {
-  window.history.replaceState(
-    {},
-    document.title,
-    window.location.pathname
-  );
+export const isUserAdmin = auth => {
+  return auth?.user?.profile?.['cognito:groups']?.includes('Admins') || false;
 };
 
-export const handleSignOutRedirect = (auth) => {
-  const clientId = auth.settings.client_id;
-  const logoutUri = getCloudfrontDomain()
-  const cognitoDomain = getCognitoDomain();
-  window.location.href = `${cognitoDomain}/logout?client_id=${clientId}&logout_uri=${encodeURIComponent(logoutUri)}`;
-  console.log(window.location.href)
+export const handleSigninCallback = () => {
+  window.history.replaceState({}, document.title, window.location.pathname);
+};
+
+export const handleSignOutRedirect = async auth => {
+  await auth.removeUser();
+  window.location.href = `${window.appConfig.auth.userPoolDomain}/logout?client_id=${window.appConfig.auth.userPoolClientId}&response_type=code&redirect_uri=${encodeURIComponent(window.appConfig.cloudFrontUrl)}`;
 };

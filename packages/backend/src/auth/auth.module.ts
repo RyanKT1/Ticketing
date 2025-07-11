@@ -1,12 +1,10 @@
 import { Module } from '@nestjs/common';
-import { PassportModule } from '@nestjs/passport';
-import { CognitoStrategy } from './strategies/cognito.strategy';
 import { AuthController } from './auth.controller';
+import { RequestContextProvider } from './providers/request-context.provider';
 
 @Module({
-  imports: [PassportModule],
   controllers: [AuthController],
-  providers: [CognitoStrategy],
-  exports: [PassportModule],
+  providers: [RequestContextProvider],
+  exports: [RequestContextProvider],
 })
 export class AuthModule {}

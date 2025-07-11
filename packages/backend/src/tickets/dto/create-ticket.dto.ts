@@ -1,24 +1,30 @@
-import { IsString, IsNotEmpty, IsNumber, IsUUID } from 'class-validator';
+import { IsString, IsNotEmpty, IsNumber, IsUUID, IsOptional } from 'class-validator';
 
 export class CreateTicketDto {
-    @IsString()
-    @IsUUID()
-    deviceId: string;
+  @IsOptional()
+  @IsString()
+  @IsUUID()
+  deviceId: string;
 
-    @IsString()
-    deviceManufacturer: string;
+  @IsOptional()
+  @IsString()
+  deviceManufacturer: string;
 
-    @IsString()
-    deviceModel: string;
+  @IsOptional()
+  @IsString()
+  deviceModel: string;
 
+  @IsString()
+  title: string;
 
-    @IsString()
-    description: string;
+  @IsString()
+  description: string;
 
-    @IsNumber()
-    @IsNotEmpty()
-    severity:number
+  @IsNumber()
+  @IsNotEmpty()
+  severity: number;
 
-    @IsString()
-    ticketOwner: string;
+  @IsOptional()
+  @IsString()
+  ticketOwner: string;
 }

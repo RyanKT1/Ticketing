@@ -23,11 +23,11 @@ function App() {
             <main className="main-content">
               <Routes>
                 <Route index element={<HomePage />} />
-                <Route path='device'>
+                <Route path="device">
                   <Route path="create" element={<CreateDevicePage />} />
-                  <Route path='table' element={<DeviceTablePage />} />
+                  <Route path="table" element={<DeviceTablePage />} />
                 </Route>
-                <Route path='ticket'>
+                <Route path="ticket">
                   <Route path="create" element={<CreateTicketPage />} />
                   <Route path="create/:deviceId" element={<CreateTicketPage />} />
                   <Route path="info/:id" element={<TicketPage />} />

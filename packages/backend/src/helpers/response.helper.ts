@@ -74,7 +74,6 @@ export interface SuccessResponse {
   success: true;
   data: any;
   statusCode: number;
-  timestamp: string;
 }
 
 export interface ErrorResponse {
@@ -85,25 +84,23 @@ export interface ErrorResponse {
     details?: any;
   };
   statusCode: number;
-  timestamp: string;
 }
 
 export function makeSuccessResponse(
-  data: any = null, 
-  statusCode: number = HttpStatus.OK, 
+  data: any = null,
+  statusCode: number = HttpStatus.OK,
 ): SuccessResponse {
   return {
     success: true,
     data,
     statusCode,
-    timestamp: new Date().toISOString(),
   };
 }
 
 export function makeErrorResponse(
   errorType: ErrorType,
   customMessage?: string,
-  details?: any
+  details?: any,
 ): ErrorResponse {
   return {
     success: false,
@@ -113,6 +110,5 @@ export function makeErrorResponse(
       details,
     },
     statusCode: errorType.statusCode,
-    timestamp: new Date().toISOString(),
   };
 }

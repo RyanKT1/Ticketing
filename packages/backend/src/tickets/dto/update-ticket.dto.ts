@@ -3,7 +3,9 @@ import { CreateTicketDto } from './create-ticket.dto';
 import { IsBoolean } from 'class-validator';
 
 class AdditionalTicketInfo {
-    @IsBoolean()
-    resolved: boolean;
+  @IsBoolean()
+  resolved: boolean;
 }
-export class UpdateTicketDto extends PartialType(IntersectionType(CreateTicketDto, AdditionalTicketInfo)) {}
+export class UpdateTicketDto extends PartialType(
+  IntersectionType(CreateTicketDto, AdditionalTicketInfo),
+) {}

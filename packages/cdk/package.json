@@ -13,7 +13,10 @@
     "watch": "tsc -w",
     "test": "jest",
     "cdk": "cdk",
-    "lint": "eslint --fix --ext .ts ",
+    "lint": "eslint --ext .ts .",
+    "lint:fix": "eslint --fix --ext .ts .",
+    "format": "prettier --check \"lib/**/*.ts\"",
+    "format:fix": "prettier --write \"lib/**/*.ts\"",
     "clean": "rm -rf cdk.out node_modules dist"
   },
   "dependencies": {

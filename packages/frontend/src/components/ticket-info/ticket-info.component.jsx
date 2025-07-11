@@ -1,32 +1,29 @@
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import { Button, Form } from 'react-bootstrap';
 import styles from './ticket-info.module.css';
 
-function TicketInfo({ ticket = {}, messages = [], onEditClick, onDeleteClick, onDeleteMessage, onSendMessage }) {
+function TicketInfo({
+  ticket = {},
+  messages = [],
+  onEditClick,
+  onDeleteClick,
+  onDeleteMessage,
+  onSendMessage,
+  canModify = false,
+  currentUser = '',
+  isAdmin = false,
+}) {
   const [messageContent, setMessageContent] = useState('');
-  const [selectedFile, setSelectedFile] = useState(null);
-  const fileInputRef = useRef(null);
-  
-  const handleFileChange = (e) => {
-    if (e.target.files && e.target.files[0]) {
-      setSelectedFile(e.target.files[0]);
-    }
-  };
-  
+
   const handleSendMessage = () => {
-    if (messageContent.trim() || selectedFile) {
+    if (messageContent.trim()) {
       const messageData = {
         ticketId: ticket.id,
         content: messageContent,
-        fileName: selectedFile ? selectedFile.name : null
       };
-      
-      onSendMessage(messageData, selectedFile);
+
+      onSendMessage(messageData);
       setMessageContent('');
-      setSelectedFile(null);
-      if (fileInputRef.current) {
-        fileInputRef.current.value = '';
-      }
     }
   };
 
@@ -35,22 +32,16 @@ function TicketInfo({ ticket = {}, messages = [], onEditClick, onDeleteClick, on
       <div className={styles.contentLayout}>
         <div className={styles.ticketHeader}>
           <h2>Ticket Details</h2>
-          <div className={styles.ticketActions}>
-            <Button 
-              variant="primary" 
-              className={styles.actionButton}
-              onClick={onEditClick}
-            >
-              Edit
-            </Button>
-            <Button 
-              variant="danger" 
-              className={styles.actionButton}
-              onClick={onDeleteClick}
-            >
-              Delete
-            </Button>
-          </div>
+          {canModify && (
+            <div className={styles.ticketActions}>
+              <Button variant="primary" className={styles.actionButton} onClick={onEditClick}>
+                Edit
+              </Button>
+              <Button variant="danger" className={styles.actionButton} onClick={onDeleteClick}>
+                Delete
+              </Button>
+            </div>
+          )}
         </div>
 
         <div className={styles.ticketDetailsContainer}>
@@ -63,7 +54,9 @@ function TicketInfo({ ticket = {}, messages = [], onEditClick, onDeleteClick, on
               </div>
               <div className={styles.detailRow}>
                 <span className={styles.detailLabel}>Status:</span>
-                <span className={`${styles.detailValue} ${ticket.resolved ? styles.resolved : styles.unresolved}`}>
+                <span
+                  className={`${styles.detailValue} ${ticket.resolved ? styles.resolved : styles.unresolved}`}
+                >
                   {ticket.resolved ? 'Resolved' : 'Unresolved'}
                 </span>
               </div>
@@ -76,7 +69,7 @@ function TicketInfo({ ticket = {}, messages = [], onEditClick, onDeleteClick, on
                 <span className={styles.detailValue}>{ticket.ticketOwner || 'N/A'}</span>
               </div>
             </div>
-            
+
             {/* Right Column */}
             <div>
               {ticket.deviceId ? (
@@ -110,11 +103,11 @@ function TicketInfo({ ticket = {}, messages = [], onEditClick, onDeleteClick, on
               </div>
             </div>
           </div>
-          
+
           <div className={styles.descriptionSection}>
             <div className={styles.description}>
               <h3>Description</h3>
-              <p>{ticket.ticketDescription || 'No description available'}</p>
+              <p>{ticket.description || 'No description available'}</p>
             </div>
           </div>
         </div>
@@ -131,29 +124,19 @@ function TicketInfo({ ticket = {}, messages = [], onEditClick, onDeleteClick, on
                       <span className={styles.messageTime}>
                         {new Date(message.createdAt).toLocaleString()}
                       </span>
-                      <Button 
-                        variant="outline-danger" 
-                        size="sm"
-                        className={styles.deleteMessageBtn}
-                        onClick={() => onDeleteMessage && onDeleteMessage(message.id)}
-                      >
-                        Delete
-                      </Button>
+                      {(isAdmin || message.author === currentUser) && (
+                        <Button
+                          variant="outline-danger"
+                          size="sm"
+                          className={styles.deleteMessageBtn}
+                          onClick={() => onDeleteMessage && onDeleteMessage(message.id)}
+                        >
+                          Delete
+                        </Button>
+                      )}
                     </div>
                   </div>
                   <div className={styles.messageContent}>{message.content}</div>
-                  {message.fileName && message.s3Link && (
-                    <div className={styles.attachmentContainer}>
-                      <a 
-                        href={message.s3Link} 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className={styles.attachmentLink}
-                      >
-                        <i className="bi bi-paperclip"></i> {message.fileName}
-                      </a>
-                    </div>
-                  )}
                 </div>
               ))
             ) : (
@@ -168,31 +151,10 @@ function TicketInfo({ ticket = {}, messages = [], onEditClick, onDeleteClick, on
               placeholder="Type a new message..."
               className={styles.messageInput}
               value={messageContent}
-              onChange={(e) => setMessageContent(e.target.value)}
+              onChange={e => setMessageContent(e.target.value)}
             />
             <div className={styles.messageActions}>
-              <div className={styles.fileInputContainer}>
-                <input
-                  type="file"
-                  id="file-upload"
-                  className={styles.fileInput}
-                  onChange={handleFileChange}
-                  ref={fileInputRef}
-                />
-                <label htmlFor="file-upload" className={styles.fileInputLabel}>
-                  <i className="bi bi-paperclip"></i> Attach File
-                </label>
-                {selectedFile && (
-                  <span className={styles.selectedFileName}>
-                    {selectedFile.name}
-                  </span>
-                )}
-              </div>
-              <Button 
-                variant="primary" 
-                className={styles.sendButton}
-                onClick={handleSendMessage}
-              >
+              <Button variant="primary" className={styles.sendButton} onClick={handleSendMessage}>
                 Send
               </Button>
             </div>

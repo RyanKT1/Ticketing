@@ -1,12 +1,12 @@
 import { Controller, Get, Request, UseGuards } from '@nestjs/common';
-import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { RolesGuard } from './guards/roles.guard';
 import { Roles } from './decorators/roles.decorator';
+import { ApiGatewayAuthGuard } from './guards/api-gateway-auth.guard';
 
 @Controller('auth')
 export class AuthController {
   @Get('profile')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(ApiGatewayAuthGuard)
   getProfile(@Request() req) {
     return {
       userId: req.user.userId,
@@ -17,7 +17,7 @@ export class AuthController {
   }
 
   @Get('admin')
-  @UseGuards(JwtAuthGuard, RolesGuard)
+  @UseGuards(ApiGatewayAuthGuard, RolesGuard)
   @Roles('Admins')
   adminOnly(@Request() req) {
     return {
@@ -27,8 +27,8 @@ export class AuthController {
   }
 
   @Get('user')
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('Users', 'Admins')
+  @UseGuards(ApiGatewayAuthGuard, RolesGuard)
+  @Roles('Admins')
   userOnly(@Request() req) {
     return {
       message: 'This is a user-only endpoint',

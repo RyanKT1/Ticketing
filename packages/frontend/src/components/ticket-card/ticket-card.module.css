@@ -63,3 +63,14 @@
 .ticketCard :global(.btn:hover) {
     transform: translateY(-1px);
 }
+
+.ticketCard nav a {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+}
+
+.ticketCard nav a:hover {
+    text-decoration: none;
+    color: inherit;
+}
