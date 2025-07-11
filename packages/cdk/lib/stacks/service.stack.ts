@@ -3,6 +3,7 @@ import {
   AccessLogFormat,
   LambdaRestApi,
   LogGroupLogDestination,
+  MethodLoggingLevel,
 } from "aws-cdk-lib/aws-apigateway";
 import { Distribution, ViewerProtocolPolicy } from "aws-cdk-lib/aws-cloudfront";
 import { S3BucketOrigin } from "aws-cdk-lib/aws-cloudfront-origins";
@@ -42,7 +43,7 @@ export class ServiceStack extends Stack {
     const domainName = `${props.stageName}.qadeviceticketing.com`;
     const ticketingLambda = new Function(this, "TicketingLambda", {
       runtime: Runtime.NODEJS_18_X,
-      handler: "dist/lambda.handler",
+      handler: "dist/main.handler",
       code: Code.fromAsset(lambdaPath),
       functionName: "TicketingLambda",
       logGroup: props.lambdaLogGroup,
@@ -128,10 +129,14 @@ export class ServiceStack extends Stack {
         ),
         accessLogFormat: AccessLogFormat.jsonWithStandardFields(),
         stageName: props.stageName,
+        loggingLevel:MethodLoggingLevel.INFO,
+        dataTraceEnabled:true,
+        tracingEnabled:true,
+        metricsEnabled:true
       },
       defaultCorsPreflightOptions: {
         allowOrigins: [distributionDomainUrl],
-        allowMethods: ["GET", "POST", "PATCH", "PUT", "DELETE"],
+        allowMethods: ["GET", "POST", "PATCH", "PUT", "DELETE","OPTIONS"],
         allowHeaders: ["Authorization", "Content-Type", "Origin", "Accept"],
         allowCredentials: true,
         exposeHeaders: ["Access-Control-Allow-Origin"],
